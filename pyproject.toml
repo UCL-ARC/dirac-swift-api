@@ -33,6 +33,10 @@ optional-dependencies = {dev = [
     "ruff",
     "tox",
     "twine",
+], test = [
+    "pytest",
+    "pytest-cov",
+    "tox",
 ]}
 readme = "README.md"
 requires-python = ">=3.11"
