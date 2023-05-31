@@ -25,10 +25,10 @@ This project is developed in collaboration with the [Centre for Advanced Researc
 ### Project Team
 
 Ilektra Christidi ([ilektra.christidi@ucl.ac.uk](mailto:ilektra.christidi@ucl.ac.uk))
-Peter Andrews-Briscoe ([p.andrews-briscoe@ucl.ac.uk](mailto:p.andrews-briscoe@ucl.ac.uk))
-Harry Moss ([h.moss@ucl.ac.uk](mailto:h.moss@ucl.ac.uk))
 
-<!-- TODO: how do we have an array of collaborators ? -->
+Peter Andrews-Briscoe ([p.andrews-briscoe@ucl.ac.uk](mailto:p.andrews-briscoe@ucl.ac.uk))
+
+Harry Moss ([h.moss@ucl.ac.uk](mailto:h.moss@ucl.ac.uk))
 
 ### Research Software Engineering Contact
 
