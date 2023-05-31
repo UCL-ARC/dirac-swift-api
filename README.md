@@ -90,9 +90,9 @@ To contribute to the project as a developer, use the following as a guide. These
 
 To make explicit some of the potentially implicit:
 
-- We will target Python versions `>= 3.10`
-- We will use linters and static type checkers to increase the legibility of the code produced here
-- Function arguments and return types will be annotated to enable the above (with type checking via [mypy](https://mypy.readthedocs.io/en/stable/))
+- We will target Python versions `>= 3.11`
+- We will use [ruff](https://beta.ruff.rs/docs/) for linting and [black](https://github.com/psf/black) for code formatting to standardise code, improve legibility and speed up code reviews
+- Function arguments and return types will be annotated, with type checking via [mypy](https://mypy.readthedocs.io/en/stable/)
 - We will use [docstrings](https://peps.python.org/pep-0257/) to annotate classes, class methods and functions
   - If you use Visual Studio Code, [autoDocstring](https://marketplace.visualstudio.com/items?itemName=njpwerner.autodocstring) is recommended to speed this along.
 
