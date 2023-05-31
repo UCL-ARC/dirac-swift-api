@@ -39,19 +39,48 @@ Centre for Advanced Research Computing, University College London
 
 ### Prerequisites
 
-- Python 3.10 and above
+- Python 3.11
 
 ### Installation
 
-How to build or install the application.
+- Clone the repository and `cd` into the repository directory
+
+- Create a virtual environment
+
+```bash
+python -m venv env
+```
+
+- activate the environment
+
+```bash
+source ./env/bin/activate
+```
+
+- While in the top-level repository directory (containing this `README.md`)
+
+```bash
+pip install ".[dev]"
+```
 
 ### Running Locally
 
+_TODO_
 How to run the application on your local system.
 
 ### Running Tests
 
-How to run tests on your local system.
+Tests can be run either via `tox` or directly via `pytest`
+
+```bash
+tox run
+```
+
+or
+
+```bash
+python -m pytest -ra . --cov=src/
+```
 
 ## Roadmap
 
