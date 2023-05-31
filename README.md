@@ -16,7 +16,7 @@
 [licence-badge]:            https://img.shields.io/badge/License-BSD_3--Clause-blue.svg
 <!-- prettier-ignore-end -->
 
-Repository for the REST API side of the DiRAC-SWIFT project 
+Repository for the REST API side of the DiRAC-SWIFT project
 
 This project is developed in collaboration with the [Centre for Advanced Research Computing](https://ucl.ac.uk/arc), University College London.
 
@@ -24,8 +24,8 @@ This project is developed in collaboration with the [Centre for Advanced Researc
 
 ### Project Team
 
-Ilektra Christidi ([ilektra.christidi@ucl.ac.uk](mailto:ilektra.christidi@ucl.ac.uk))  
-Peter Andrews-Briscoe ([p.andrews-briscoe@ucl.ac.uk](mailto:p.andrews-briscoe@ucl.ac.uk))  
+Ilektra Christidi ([ilektra.christidi@ucl.ac.uk](mailto:ilektra.christidi@ucl.ac.uk))
+Peter Andrews-Briscoe ([p.andrews-briscoe@ucl.ac.uk](mailto:p.andrews-briscoe@ucl.ac.uk))
 Harry Moss ([h.moss@ucl.ac.uk](mailto:h.moss@ucl.ac.uk))
 
 <!-- TODO: how do we have an array of collaborators ? -->
