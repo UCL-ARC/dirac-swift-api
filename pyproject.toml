@@ -51,7 +51,7 @@ run = {branch = true, parallel = true, source = [
     "dirac-swift-api",
 ]}
 paths.source = [
-    "src",
+    "src/dirac-swift-api",
     ".tox*/*/lib/python*/site-packages",
 ]
 
@@ -149,7 +149,7 @@ legacy_tox_ini = """
 
     [testenv]
     commands =
-        pytest --cov
+        pytest --cov=src/dirac-swift-api
     deps =
         pytest
         pytest-cov
