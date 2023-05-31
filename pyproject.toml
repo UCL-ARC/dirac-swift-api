@@ -7,7 +7,9 @@ requires = [
 
 [project]
 authors = [
-    {email = "h.moss@ucl.ac.uk", name = "UCL ARC"},
+    {email = "h.moss@ucl.ac.uk", name = "Harry Moss"},
+    {email = "ilektra.christidi@ucl.ac.uk", name = "Ilektra Christidi"},
+    {email = "p.andrews-briscoe@ucl.ac.uk", name = "Peter Andrews-Briscoe"},
 ]
 classifiers = [
     "Operating System :: POSIX",
@@ -130,7 +132,7 @@ pep8-naming.classmethod-decorators = [
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
-write_to = "src/dirac-swift-api/_version.py"
+write_to = "src/_version.py"
 
 [tool.tomlsort]
 all = true
