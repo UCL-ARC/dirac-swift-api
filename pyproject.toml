@@ -19,6 +19,13 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "aiofiles",
+    "fastapi",
+    "jinja2",
+    "psycopg2",
+    "python-dotenv",
+    "sqlalchemy",
+    "uvicorn",
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
 dynamic = [
