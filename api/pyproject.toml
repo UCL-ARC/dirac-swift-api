@@ -61,7 +61,7 @@ run = {branch = true, parallel = true, source = [
   "dirac-swift-api"
 ]}
 paths.source = [
-  "api",
+  "src/api",
   ".tox*/*/lib/python*/site-packages"
 ]
 
