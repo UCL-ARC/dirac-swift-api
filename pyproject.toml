@@ -22,6 +22,7 @@ dependencies = [
     "aiofiles",
     "fastapi",
     "jinja2",
+    "loguru",
     "psycopg2",
     "python-dotenv",
     "sqlalchemy",
@@ -138,6 +139,9 @@ pep8-naming.classmethod-decorators = [
     "classmethod",
     "pydantic.validator",
 ]
+
+[tool.ruff.pydocstyle]
+convention = "google"
 
 [tool.setuptools_scm]
 local_scheme = "no-local-version"
