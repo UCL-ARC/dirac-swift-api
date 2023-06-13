@@ -155,7 +155,7 @@ legacy_tox_ini = """
 
     [testenv]
     commands =
-        pytest --cov=api
+        pytest -ra . --cov=api/src/api
     deps =
         pytest
         pytest-cov
