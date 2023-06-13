@@ -1,0 +1,17 @@
+services:
+  api:
+    build:
+      dockerfile: docker/api/Dockerfile
+    env_file: .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      interval: 200s
+      timeout: 200s
+      retries: 5
+    ports:
+      - ${API_PORT}:8000
+    networks:
+      - swiftapi
+
+networks:
+  swiftapi:
