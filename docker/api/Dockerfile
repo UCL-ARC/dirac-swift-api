@@ -13,7 +13,7 @@ RUN  apt-get autoremove && apt-get clean && rm -rf /var/lib/apt/lists/*
 # User setup
 RUN useradd -u $API_UID -g 0 dirac
 
-RUN mkdir /app && \
+RUN mkdir -p /app/api && \
     chown -R $API_UID:0 /app
 
 WORKDIR /app
@@ -28,7 +28,8 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 RUN pip install --no-cache-dir -U pip
 
 # Copy source directories and install
-COPY --chown=dirac:root ./api/pyproject.toml /app/api/
+COPY --chown=dirac:root ./api/pyproject.toml /app/api
+
 RUN pip install --no-cache-dir /app/api
 
 COPY --chown=dirac:root ./api/src/api /app/api

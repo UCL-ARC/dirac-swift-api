@@ -1,11 +1,12 @@
 [build-system]
 build-backend = "setuptools.build_meta"
 requires = [
-  "setuptools",
-  "setuptools-scm"
+  "setuptools"
 ]
 
 [project]
+name = "dirac-swift-api"
+version = "0.0.1"
 authors = [
   {email = "h.moss@ucl.ac.uk", name = "Harry Moss"},
   {email = "ilektra.christidi@ucl.ac.uk", name = "Ilektra Christidi"},
@@ -29,12 +30,8 @@ dependencies = [
   "uvicorn"
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
-dynamic = [
-  "version"
-]
 keywords = [
 ]
-name = "dirac-swift-api"
 optional-dependencies = {dev = [
   "black",
   "build",
@@ -142,11 +139,6 @@ pep8-naming.classmethod-decorators = [
 
 [tool.ruff.pydocstyle]
 convention = "google"
-
-[tool.setuptools_scm]
-root = ".."
-local_scheme = "no-local-version"
-write_to = "api/_version.py"
 
 [tool.tomlsort]
 all = true
