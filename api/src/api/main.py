@@ -1,13 +1,10 @@
 """Entry point and main file for the FastAPI backend."""
 from fastapi import APIRouter, FastAPI
-from fastapi.responses import ORJSONResponse
 from loguru import logger
 
 logger.info("API starting")
 
-app = FastAPI(
-    default_response_class=ORJSONResponse,
-)
+app = FastAPI()
 
 # Define a mock router for testing
 mock_router = APIRouter(
