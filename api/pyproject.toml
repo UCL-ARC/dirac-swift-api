@@ -25,8 +25,8 @@ dependencies = [
   "jinja2",
   "loguru",
   "psycopg2",
+  "pydantic",
   "python-dotenv",
-  "sqlalchemy",
   "uvicorn"
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
@@ -41,7 +41,9 @@ optional-dependencies = {dev = [
   "pytest-cov",
   "ruff",
   "tox",
-  "twine"
+  "twine",
+  "types-urllib3",
+  "types-requests"
 ], test = [
   "pytest",
   "pytest-cov",
@@ -63,11 +65,18 @@ paths.source = [
 ]
 
 [tool.mypy]
+ignore_missing_imports = true
 explicit_package_bases = true
 plugins = [
   "numpy.typing.mypy_plugin",
   "pydantic.mypy"
 ]
+follow_imports = "silent"
+warn_redundant_casts = true
+warn_unused_ignores = true
+disallow_any_generics = true
+check_untyped_defs = true
+no_implicit_reexport = true
 
 [tool.pytest.ini_options]
 addopts = "--color=yes -v"
@@ -155,7 +164,7 @@ legacy_tox_ini = """
 
     [testenv]
     commands =
-        pytest -ra . --cov=src/api
+        pytest -ra src/api/tests --cov=src/api
     deps =
         pytest
         pytest-cov
