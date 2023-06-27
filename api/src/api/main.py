@@ -23,3 +23,13 @@ def ping() -> dict[str, str]:
         dict[str, str]: Some example content
     """
     return {"ping": "pong"}
+
+
+@app.get("/pong")
+def pong() -> dict[str, str]:
+    """Define an API route for testing purposes.
+
+    Returns:
+        dict[str, str]: Some example content
+    """
+    return {"pong": "ping"}
