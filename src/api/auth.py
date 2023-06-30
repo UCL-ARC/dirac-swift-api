@@ -8,7 +8,7 @@ from loguru import logger
 from requests import Session
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
-from api.config import get_settings
+from api.config import Settings
 
 
 class SwiftAuthenticator:
@@ -16,6 +16,7 @@ class SwiftAuthenticator:
 
     def __init__(
         self,
+        settings: Settings,
         cookies_file: Path = Path(__file__).parents[5] / "api/cookie_jar.txt",
     ):
         """Class constructor for authenticator object.
@@ -24,8 +25,6 @@ class SwiftAuthenticator:
             cookies_file (str, optional): Name of the cookie jar file.
                 Defaults to "cookie_jar.txt".
         """
-        settings = get_settings()
-
         self.username = settings.username
         self.password = settings.password.get_secret_value()
         self.db_url = settings.db_url
