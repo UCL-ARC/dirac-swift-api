@@ -1,22 +1,16 @@
 """Entry point and main file for the FastAPI backend."""
-from fastapi import APIRouter, FastAPI
+from fastapi import FastAPI
 from loguru import logger
+
+from api.auth import SwiftAuthenticator
 
 logger.info("API starting")
 
 app = FastAPI()
 
-# Define a mock router for testing
-mock_router = APIRouter(
-    prefix="/mock",
-)
-
-# Include the mock router in the main router
-app.include_router(mock_router)
-
 
 @app.get("/ping")
-def ping() -> dict[str, str]:
+async def ping() -> dict[str, str]:
     """Define an API route for testing purposes.
 
     Returns:
@@ -25,11 +19,12 @@ def ping() -> dict[str, str]:
     return {"ping": "pong"}
 
 
-@app.get("/pong")
-def pong() -> dict[str, str]:
-    """Define an API route for testing purposes.
+@app.get("/auth")
+async def auth() -> bool:
+    """Authenticate a user against the Virgo DB.
 
     Returns:
-        dict[str, str]: Some example content
+        bool: Simple True/False if user was authenticated
     """
-    return {"pong": "ping"}
+    authenticator = SwiftAuthenticator()
+    return authenticator.authenticate()

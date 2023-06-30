@@ -14,7 +14,10 @@ from api.config import get_settings
 class SwiftAuthenticator:
     """Class to handle authentication against the Virgo DB."""
 
-    def __init__(self, cookies_file: str = "cookie_jar.txt"):
+    def __init__(
+        self,
+        cookies_file: Path = Path(__file__).parents[5] / "api/cookie_jar.txt",
+    ):
         """Class constructor for authenticator object.
 
         Args:
@@ -26,8 +29,9 @@ class SwiftAuthenticator:
         self.username = settings.username
         self.password = settings.password.get_secret_value()
         self.db_url = settings.db_url
+        logger.info(f"Settings cookies path as {cookies_file}")
 
-        self.cookies_file = Path(cookies_file).absolute()
+        self.cookies_file = cookies_file
 
     def authenticate(self) -> bool:
         """Authenticate against the VirgoDB server.
