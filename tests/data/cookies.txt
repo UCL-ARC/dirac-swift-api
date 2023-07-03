@@ -1,1 +1,1 @@
-cookie
+{"SESSIONID": "TESTSESSION"}

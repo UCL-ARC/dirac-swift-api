@@ -17,7 +17,7 @@ class SwiftAuthenticator:
     def __init__(
         self,
         settings: Settings,
-        cookies_file: Path = Path(__file__).parents[5] / "api/cookie_jar.txt",
+        cookies_file: Path = Path(__file__).parents[5] / "src/api/cookie_jar.txt",
     ):
         """Class constructor for authenticator object.
 
@@ -32,24 +32,41 @@ class SwiftAuthenticator:
 
         self.cookies_file = cookies_file
 
-    def authenticate(self) -> bool:
-        """Authenticate against the VirgoDB server.
+    def validate_credentials(self, session: Session) -> int:
+        """Validate user credentials.
+
+        Return an appropriate status code to denote
+        successful or unsuccessful auth
 
         Returns:
-            bool: Authentication successful if True, unsuccessful if False
+            int: Denotes status of authentication request
         """
-        session = Session()
-        session = self.load_cookies(session)
         try:
-            response = session.get(self.db_url, auth=(self.username, self.password))
+            response = session.get(
+                self.db_url,
+                auth=(self.username, self.password),
+                cookies=session.cookies,
+            )
             if response.status_code == status.HTTP_200_OK:
                 self.save_cookies(session)
-                return True
-            return False
+            elif response.status_code == status.HTTP_401_UNAUTHORIZED:
+                message = "Unauthorised user."
+                logger.error(message)
+            return response.status_code
         except requests.exceptions.RequestException as exception:
             logger.error("Malformed URL in request.")
             logger.error(exception)
-            return False
+            return status.HTTP_404_NOT_FOUND
+
+    def authenticate(self) -> int:
+        """Authenticate against the VirgoDB server.
+
+        Returns:
+            int: HTTP status code of authentication request
+        """
+        session = Session()
+        session = self.load_cookies(session)
+        return self.validate_credentials(session)
 
     def save_cookies(self, session: requests.Session) -> requests.Session:
         """Save cookies associated with a session object.
