@@ -57,6 +57,3 @@ jobs:
 
       - name: Run tests
         run: python -m pytest -ra . --cov=src/api
-
-      - name: Upload coverage report
-        uses: codecov/codecov-action@v3.1.4
