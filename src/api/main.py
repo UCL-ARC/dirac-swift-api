@@ -22,11 +22,11 @@ async def ping() -> dict[str, str]:
 
 
 @app.get("/auth")
-async def auth(settings: Settings = Depends(get_settings)) -> int:
+async def auth(settings: Settings = Depends(get_settings)) -> dict[str, str]:
     """Authenticate a user against the Virgo DB.
 
     Returns:
-        int: HTTP status code denoting if user was authenticated
+        dict[str, str]: HTTP status code denoting if user was authenticated
     """
     authenticator = SwiftAuthenticator(settings)
-    return authenticator.authenticate()
+    return {"auth_result_status": str(authenticator.authenticate())}
