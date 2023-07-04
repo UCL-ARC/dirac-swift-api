@@ -1,8 +1,10 @@
 """Entry point and main file for the FastAPI backend."""
-from fastapi import FastAPI
+
+from fastapi import Depends, FastAPI
 from loguru import logger
 
 from api.auth import SwiftAuthenticator
+from api.config import Settings, get_settings
 
 logger.info("API starting")
 
@@ -20,11 +22,11 @@ async def ping() -> dict[str, str]:
 
 
 @app.get("/auth")
-async def auth() -> bool:
+async def auth(settings: Settings = Depends(get_settings)) -> int:
     """Authenticate a user against the Virgo DB.
 
     Returns:
-        bool: Simple True/False if user was authenticated
+        int: HTTP status code denoting if user was authenticated
     """
-    authenticator = SwiftAuthenticator()
+    authenticator = SwiftAuthenticator(settings)
     return authenticator.authenticate()

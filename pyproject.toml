@@ -20,6 +20,7 @@ classifiers = [
 dependencies = [
     "aiofiles",
     "fastapi",
+    "httpx",
     "jinja2",
     "loguru",
     "psycopg2",
@@ -90,9 +91,10 @@ testpaths = [
 fix = true
 force-exclude = true
 ignore = [
+    "B008", # Do not perform function call in argument defaults
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
-    "D417", # argument description in docstring (unreliable)
+    "D417", # argument description in docstring (unreliable),
 ]
 per-file-ignores = {"test_*" = [
     "S101",

@@ -16,7 +16,7 @@ def mock_successful_response(mocker):
 
 @pytest.fixture()
 def mock_settings():
-    test_user = "test1"
-    test_pass = SecretStr("pass")
+    test_user = "test_user"
+    test_pass = SecretStr("test_pass")
     test_url = "test_url"
     return Settings(username=test_user, password=test_pass, db_url=test_url)

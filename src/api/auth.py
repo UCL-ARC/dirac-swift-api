@@ -17,13 +17,12 @@ class SwiftAuthenticator:
     def __init__(
         self,
         settings: Settings,
-        cookies_file: Path = Path(__file__).parents[5] / "src/api/cookie_jar.txt",
+        cookies_file: Path = Path(__file__).parent.resolve() / "cookie_jar.txt",
     ):
         """Class constructor for authenticator object.
 
         Args:
-            cookies_file (str, optional): Name of the cookie jar file.
-                Defaults to "cookie_jar.txt".
+            settings (str, optional): Pydantic Settings object
         """
         self.username = settings.username
         self.password = settings.password.get_secret_value()
@@ -48,6 +47,7 @@ class SwiftAuthenticator:
                 cookies=session.cookies,
             )
             if response.status_code == status.HTTP_200_OK:
+                logger.info("Authentication successful.")
                 self.save_cookies(session)
             elif response.status_code == status.HTTP_401_UNAUTHORIZED:
                 message = "Unauthorised user."
@@ -77,6 +77,7 @@ class SwiftAuthenticator:
         Returns:
             Session: Updated requests session object
         """
+        logger.info(f"Saving cookies to {self.cookies_file}")
         with self.cookies_file.open("w") as cookies:
             json.dump(dict_from_cookiejar(session.cookies), cookies)
         return session

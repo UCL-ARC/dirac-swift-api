@@ -1,4 +1,0 @@
-_version.py
-
-# Ignore dynaconf secret files
-.secrets.*

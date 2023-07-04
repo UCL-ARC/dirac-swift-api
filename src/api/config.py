@@ -1,5 +1,6 @@
 # mypy: disable-error-code="call-arg"
 """Module to define the main settings class for the API."""
+
 from pydantic import BaseSettings, SecretStr
 
 
@@ -14,6 +15,7 @@ class Settings(BaseSettings):
         """Class to set environment variable prefix for pydantic."""
 
         env_prefix = "virgo_"
+        env_file = ".env"
 
 
 def get_settings() -> Settings:
