@@ -60,26 +60,53 @@ source ./env/bin/activate
 - While in the top-level repository directory (containing this `README.md`)
 
 ```bash
-pip install ".[dev]"
+pip install "./api[dev]"
 ```
 
 ### Running Locally
 
-_TODO_
-How to run the application on your local system.
+After installing the package, from the root directory (containing this README)
+
+```bash
+uvicorn api.main:app --reload
+```
+
+By default, the API will be served on `localhost:8000`, with OpenAPI documentation available at `localhost:8000/docs`
+
+### Running via Docker Compose
+
+Create a `.env` file in the package root directory, based on the `.env.example`provided and noting the following
+
+- Provide an `API_UID` in the file matching the integer returned by `id -u`
+- Supply a port to `API_PORT` that you will use to access the API
+
+From the package root directory, bring the API up with
+
+```bash
+docker compose -p swiftapi up --build
+```
+
+where `-p swiftapi` sets the docker compose project name to `swiftapi`.
+
+Bring the running container down with
+
+```bash
+docker compose down
+```
 
 ### Running Tests
 
 Tests can be run either via `tox` or directly via `pytest`
 
 ```bash
+cd api
 tox run
 ```
 
 or
 
 ```bash
-python -m pytest -ra . --cov=src/
+python -m pytest -ra . --cov=api/src/api
 ```
 
 ## Contributing

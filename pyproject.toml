@@ -2,7 +2,6 @@
 build-backend = "setuptools.build_meta"
 requires = [
     "setuptools",
-    "setuptools-scm",
 ]
 
 [project]
@@ -19,11 +18,18 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
+    "aiofiles",
+    "fastapi",
+    "httpx",
+    "jinja2",
+    "loguru",
+    "psycopg2",
+    "pydantic",
+    "python-dotenv",
+    "requests",
+    "uvicorn",
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
-dynamic = [
-    "version",
-]
 keywords = [
 ]
 name = "dirac-swift-api"
@@ -34,16 +40,21 @@ optional-dependencies = {dev = [
     "pre-commit",
     "pytest",
     "pytest-cov",
+    "pytest-mock",
     "ruff",
     "tox",
     "twine",
+    "types-requests",
+    "types-urllib3",
 ], test = [
     "pytest",
     "pytest-cov",
+    "pytest-mock",
     "tox",
 ]}
 readme = "README.md"
 requires-python = ">=3.11"
+version = "0.0.1"
 license.file = "LICENCE.md"
 urls.homepage = "https://github.com/UCL-ARC/dirac-swift-api"
 
@@ -53,16 +64,22 @@ run = {branch = true, parallel = true, source = [
     "dirac-swift-api",
 ]}
 paths.source = [
-    "src/dirac-swift-api",
+    "src/api",
     ".tox*/*/lib/python*/site-packages",
 ]
 
 [tool.mypy]
+check_untyped_defs = true
+disallow_any_generics = true
 explicit_package_bases = true
+follow_imports = "silent"
+no_implicit_reexport = true
 plugins = [
     "numpy.typing.mypy_plugin",
     "pydantic.mypy",
 ]
+warn_redundant_casts = true
+warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 addopts = "--color=yes -v"
@@ -74,12 +91,17 @@ testpaths = [
 fix = true
 force-exclude = true
 ignore = [
+    "B008", # Do not perform function call in argument defaults
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
-    "D417", # argument description in docstring (unreliable)
+    "D417", # argument description in docstring (unreliable),
 ]
 per-file-ignores = {"test_*" = [
     "S101",
+], "tests/*" = [
+    "D100",
+    "D103",
+    "D104",
 ]}
 select = [
     "A",
@@ -132,9 +154,8 @@ pep8-naming.classmethod-decorators = [
     "pydantic.validator",
 ]
 
-[tool.setuptools_scm]
-local_scheme = "no-local-version"
-write_to = "src/_version.py"
+[tool.ruff.pydocstyle]
+convention = "google"
 
 [tool.tomlsort]
 all = true
@@ -151,10 +172,11 @@ legacy_tox_ini = """
 
     [testenv]
     commands =
-        pytest --cov=src/dirac-swift-api
+        pytest -ra tests --cov=src/api
     deps =
         pytest
         pytest-cov
+        pytest-mock
 
     [tox]
     env_list =
