@@ -18,16 +18,16 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "aiofiles",
-    "fastapi",
-    "httpx",
-    "jinja2",
-    "loguru",
-    "psycopg2",
-    "pydantic",
-    "python-dotenv",
-    "requests",
-    "uvicorn",
+    "aiofiles>=23.1.0",
+    "fastapi>=0.100.0",
+    "httpx>=0.24.1",
+    "loguru>=0.7.0",
+    "psycopg2==2.9.6",
+    "pydantic-settings==2.0.1",
+    "pydantic==2.0.2",
+    "python-dotenv>=1.0.0",
+    "requests>=2.31.0",
+    "uvicorn>=0.22.0",
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
 keywords = [
@@ -36,11 +36,11 @@ name = "dirac-swift-api"
 optional-dependencies = {dev = [
     "black",
     "build",
-    "mypy",
+    "mypy==1.4.1",
     "pre-commit",
-    "pytest",
     "pytest-cov",
     "pytest-mock",
+    "pytest==7.4.0",
     "ruff",
     "tox",
     "twine",
@@ -70,12 +70,12 @@ paths.source = [
 
 [tool.mypy]
 check_untyped_defs = true
-disallow_any_generics = true
+disallow_any_generics = false
 explicit_package_bases = true
 follow_imports = "silent"
+mypy_path = "./src/"
 no_implicit_reexport = true
 plugins = [
-    "numpy.typing.mypy_plugin",
     "pydantic.mypy",
 ]
 warn_redundant_casts = true
