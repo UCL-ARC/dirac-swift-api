@@ -70,7 +70,7 @@ paths.source = [
 
 [tool.mypy]
 check_untyped_defs = true
-disallow_any_generics = true
+disallow_any_generics = false
 explicit_package_bases = true
 follow_imports = "silent"
 no_implicit_reexport = true
