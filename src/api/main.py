@@ -35,8 +35,13 @@ def auth(settings: Settings = get_settings()) -> dict[str, str]:
     Returns:
         dict[str, str]: HTTP status code denoting if user was authenticated
     """
-    if "errors_found" in list(settings.keys()):
-        error_message = f"Missing fields for authentication {list(settings.keys())[1:]}"
+    if "missing" in list(settings.__dict__.values()):
+        missing_values = [
+            field
+            for field in settings.__dict__
+            if settings.__dict__[field] == "missing"
+        ]
+        error_message = f"Missing fields for authentication: {missing_values}"
         raise HTTPException(status_code=422, detail=error_message)
 
     authenticator = SwiftAuthenticator(settings)
