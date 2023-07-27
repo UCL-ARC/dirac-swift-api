@@ -1,7 +1,8 @@
 # mypy: disable-error-code="call-arg"
 """Module to define the main settings class for the API."""
 
-from pydantic import BaseSettings, SecretStr
+from pydantic import SecretStr
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
