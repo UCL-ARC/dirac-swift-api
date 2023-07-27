@@ -56,3 +56,40 @@ def test_auth_failure_bad_url(mocker):
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["auth_result_status"] == str(status.HTTP_404_NOT_FOUND)
+
+
+def test_settings_load_failure_missing_username():
+    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
+    os.environ["VIRGO_DB_URL"] = "http://test_url"
+    response = client.post("/auth")
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"] == "Missing fields for authentication: ['username']"
+    )
+
+
+def test_settings_load_failure_missing_password():
+    os.environ["VIRGO_USERNAME"] = "test_user"
+    os.environ["VIRGO_DB_URL"] = "http://test_url"
+    response = client.post("/auth")
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"] == "Missing fields for authentication: ['password']"
+    )
+
+
+def test_settings_load_failure_missing_url():
+    os.environ["VIRGO_USERNAME"] = "test_user"
+    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
+    response = client.post("/auth")
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert response.json()["detail"] == "Missing fields for authentication: ['db_url']"
+
+
+def test_settings_load_failure_missing_all():
+    response = client.post("/auth")
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert (
+        response.json()["detail"]
+        == "Missing fields for authentication: ['username', 'password', 'db_url']"
+    )

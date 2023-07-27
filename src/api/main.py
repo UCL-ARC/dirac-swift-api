@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from loguru import logger
 
 from api.auth import SwiftAuthenticator
-from api.config import Settings, get_settings
+from api.config import get_settings
 
 logger.info("API starting")
 
@@ -22,7 +22,7 @@ async def ping() -> dict[str, str]:
 
 
 @app.post("/auth")
-def auth(settings: Settings = get_settings()) -> dict[str, str]:
+def auth() -> dict[str, str]:
     """Authenticate a user against the Virgo DB.
 
     Args:
@@ -35,6 +35,7 @@ def auth(settings: Settings = get_settings()) -> dict[str, str]:
     Returns:
         dict[str, str]: HTTP status code denoting if user was authenticated
     """
+    settings = get_settings()
     if "missing" in list(settings.__dict__.values()):
         missing_values = [
             field
