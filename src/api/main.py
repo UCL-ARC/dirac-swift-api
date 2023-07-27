@@ -21,7 +21,7 @@ async def ping() -> dict[str, str]:
     return {"ping": "pong"}
 
 
-@app.get("/auth")
+@app.post("/auth")
 def auth(settings: Settings = get_settings()) -> dict[str, str]:
     """Authenticate a user against the Virgo DB.
 

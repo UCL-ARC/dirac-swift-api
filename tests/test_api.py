@@ -23,7 +23,7 @@ def test_auth_success(mocker):
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=200)
 
-    response = client.get("/auth")
+    response = client.post("/auth")
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["auth_result_status"] == str(status.HTTP_200_OK)
 
@@ -37,7 +37,7 @@ def test_auth_failure_bad_auth(mocker):
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=401)
 
-    response = client.get("/auth")
+    response = client.post("/auth")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["auth_result_status"] == str(status.HTTP_401_UNAUTHORIZED)
@@ -52,7 +52,7 @@ def test_auth_failure_bad_url(mocker):
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=404)
 
-    response = client.get("/auth")
+    response = client.post("/auth")
 
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["auth_result_status"] == str(status.HTTP_404_NOT_FOUND)
