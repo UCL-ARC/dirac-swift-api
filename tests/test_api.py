@@ -1,6 +1,7 @@
 import os
 
 from api.auth import SwiftAuthenticator
+from api.config import get_settings
 from api.main import app
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -81,7 +82,8 @@ def test_settings_load_failure_missing_password():
 def test_settings_load_failure_missing_url():
     os.environ["VIRGO_USERNAME"] = "test_user"
     os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
-    response = client.post("/auth")
+    settings = get_settings()
+    response = client.post(f"/auth?{settings}")
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json()["detail"] == "Missing fields for authentication: ['db_url']"
 
