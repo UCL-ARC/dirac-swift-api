@@ -11,7 +11,7 @@ class Settings(BaseSettings):
 
     username: str
     password: SecretStr
-    db_url: str
+    db_url: str = "http://virgodb.dur.ac.uk:8080/Eagle/"
 
     class Config:
         """Class to set environment variable prefix for pydantic."""
