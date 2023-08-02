@@ -22,7 +22,7 @@ async def ping() -> dict[str, str]:
 
 
 @app.post("/auth")
-def auth() -> dict[str, str]:
+def auth(env: str | None = None) -> dict[str, str]:
     """Authenticate a user against the Virgo DB.
 
     Args:
@@ -35,7 +35,11 @@ def auth() -> dict[str, str]:
     Returns:
         dict[str, str]: HTTP status code denoting if user was authenticated
     """
-    settings = get_settings()
+    if env == "test":
+        settings = get_settings(_env_file="tests/data/.env.test")
+    else:
+        settings = get_settings()
+
     if "missing" in list(settings.__dict__.values()):
         missing_values = [
             field
