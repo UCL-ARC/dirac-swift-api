@@ -9,12 +9,12 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     """Class to store typed settings via Pydantic."""
 
-    username: str = Field(..., min_length=1)
-    password: SecretStr = Field(..., min_length=1)
     db_url: str = "http://virgodb.dur.ac.uk:8080/Eagle/"
+    access_token_expiry_mins: int
+    secret_key: str
+    algorithm: str
 
     model_config = SettingsConfigDict(
-        env_prefix="virgo_",
         env_file=".env",
         env_file_encoding="utf-8",
     )
@@ -44,8 +44,6 @@ def get_settings(*args, **kwargs) -> Settings:
             errors_msg.update(error_msg)
 
         error_settings = Settings(
-            username="error",
-            password="error",  # noqa: S106
             db_url="error",
         )
 

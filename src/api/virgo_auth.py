@@ -16,7 +16,9 @@ class SwiftAuthenticator:
 
     def __init__(
         self,
-        settings: Settings,
+        username,
+        password,
+        db_url,
         cookies_file: Path = Path(__file__).parent.resolve() / "cookie_jar.txt",
     ):
         """Class constructor for authenticator object.
@@ -24,10 +26,9 @@ class SwiftAuthenticator:
         Args:
             settings (str, optional): Pydantic Settings object
         """
-        self.username = settings.username
-        self.password = settings.password.get_secret_value()
-        self.db_url = settings.db_url
-        logger.info(f"Settings cookies path as {cookies_file}")
+        self.username = username
+        self.password = password
+        self.db_url = db_url
 
         self.cookies_file = cookies_file
 
