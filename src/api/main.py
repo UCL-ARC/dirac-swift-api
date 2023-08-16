@@ -24,5 +24,19 @@ async def ping() -> dict[str, str]:
 
 
 @app.get("/retrieve")
-def retrieve_contents(env: str | None = None) -> dict[str, str]:
+async def retrieve_contents(env: str | None = None) -> dict[str, str]:
+    """This needs to be a route that will retrieve the processed contents
+    of some HDF5 file on the system
+
+    We'll already be authenticated at this point
+    This route should just fetch the contents of some async function that does 
+    the actual heavy lifting.
+    
+
+    Args:
+        env (str | None, optional): _description_. Defaults to None.
+
+    Returns:
+        dict[str, str]: _description_
+    """
     pass
