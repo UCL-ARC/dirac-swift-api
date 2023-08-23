@@ -1,6 +1,7 @@
 import h5py
 import numpy as np
 from swiftsimio.accelerated import read_ranges_from_file
+import json
 
 def get_dataset_alias_map():
     """Retrieve a dictionary mapping of aliases to file paths
@@ -11,6 +12,12 @@ def get_dataset_alias_map():
     return {
         "test_file": "/Users/hmoss/dirac-swift-api/sample_data/colibre_0023.hdf5"
     }
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        return json.JSONEncoder.default(self, obj)
 
 class SWIFTProcessor:
     def __init__(self, data_alias_map: dict):
@@ -31,6 +38,17 @@ class SWIFTProcessor:
             _type_: _description_
         """
         return self.data_alias_map.get(dataset_alias)
+
+    def load_ndarray_from_json(self, json_array: str):
+
+        loaded_json = json.loads(json_array)
+        restored_array = np.asarray(loaded_json)
+
+        return restored_array
+
+    def generate_json_from_ndarray(self, array: np.ndarray):
+        json_array = json.dumps(array, cls=NumpyEncoder)
+        return json_array
 
     def get_array_masked(
         self,
