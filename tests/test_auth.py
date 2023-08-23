@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from api.auth import SwiftAuthenticator
+from api.virgo_auth import SwiftAuthenticator
 from fastapi import status
 from requests import Session
 from requests.exceptions import RequestException

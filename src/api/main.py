@@ -5,13 +5,14 @@ from loguru import logger
 
 from api.virgo_auth import SwiftAuthenticator
 from api.config import get_settings
-from api.routers import auth
+from api.routers import auth, file_processing
 
 logger.info("API starting")
 
 app = FastAPI()
 
 app.include_router(auth.router)
+app.include_router(file_processing.router)
 
 @app.get("/ping")
 async def ping() -> dict[str, str]:

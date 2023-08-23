@@ -27,6 +27,7 @@ dependencies = [
     "pydantic~=2.1",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
+    "swiftsimio~=7.0.1",
     "uvicorn>=0.22.0",
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
