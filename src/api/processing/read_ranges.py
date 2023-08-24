@@ -10,7 +10,8 @@ def get_dataset_alias_map():
         _type_: _description_
     """
     return {
-        "test_file": "/Users/hmoss/dirac-swift-api/sample_data/colibre_0023.hdf5"
+        "downloaded_file": "/Users/hmoss/dirac-swift-api/sample_data/colibre_0023.hdf5",
+        "sample_file": "/Users/hmoss/dirac-swift-api/sample_data/cosmo_volume_example.hdf5"
     }
 
 class NumpyEncoder(json.JSONEncoder):
@@ -39,16 +40,20 @@ class SWIFTProcessor:
         """
         return self.data_alias_map.get(dataset_alias)
 
-    def load_ndarray_from_json(self, json_array: str):
+    def load_ndarray_from_json(self, json_array: str, data_type: str):
 
         loaded_json = json.loads(json_array)
-        restored_array = np.asarray(loaded_json)
+        restored_array = np.asarray(loaded_json, dtype=data_type)
 
         return restored_array
 
     def generate_json_from_ndarray(self, array: np.ndarray):
         json_array = json.dumps(array, cls=NumpyEncoder)
-        return json_array
+        data_type = str(array.dtype)
+        return {
+            "array": json_array,
+            "dtype": data_type,
+        }
 
     def get_array_masked(
         self,
