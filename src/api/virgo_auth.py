@@ -8,8 +8,6 @@ from loguru import logger
 from requests import Session
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 
-from api.config import Settings
-
 
 class SwiftAuthenticator:
     """Class to handle authentication against the Virgo DB."""

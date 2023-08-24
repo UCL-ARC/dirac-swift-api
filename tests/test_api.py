@@ -1,7 +1,7 @@
 import os
 
-from api.virgo_auth import SwiftAuthenticator
 from api.main import app
+from api.virgo_auth import SwiftAuthenticator
 from fastapi import status
 from fastapi.testclient import TestClient
 

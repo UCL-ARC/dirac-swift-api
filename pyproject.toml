@@ -96,7 +96,10 @@ ignore = [
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
     "D417", # argument description in docstring (unreliable),
+    "PGH003", # Use specific rule codes when ignoring type issues
+    "PLR0913", # Too many arguments to function call
 ]
+line-length = 100
 per-file-ignores = {"test_*" = [
     "S101",
 ], "tests/*" = [

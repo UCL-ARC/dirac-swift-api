@@ -1,53 +1,94 @@
+"""Implements SWIFTsimIO data processing functionality on the server side.
+
+This module calls SWIFTsimIO functions and creates numpy arrays from HDF5 files
+read on the server.
+"""
+import json
+from typing import Any
+
 import h5py
 import numpy as np
+from loguru import logger
 from swiftsimio.accelerated import read_ranges_from_file
-import json
+
 
 def get_dataset_alias_map():
-    """Retrieve a dictionary mapping of aliases to file paths
+    """Retrieve a dictionary mapping of aliases to file paths.
 
     Returns:
         _type_: _description_
     """
     return {
         "downloaded_file": "/Users/hmoss/dirac-swift-api/sample_data/colibre_0023.hdf5",
-        "sample_file": "/Users/hmoss/dirac-swift-api/sample_data/cosmo_volume_example.hdf5"
+        "sample_file": "/Users/hmoss/dirac-swift-api/sample_data/cosmo_volume_example.hdf5",
     }
 
+
 class NumpyEncoder(json.JSONEncoder):
-    def default(self, obj):
+    """Enables JSON serialisation of numpy objects."""
+
+    def default(self, obj) -> Any:
+        """Default serialisation.
+
+        Args:
+            obj (_type_): Object to serialise
+        Returns:
+            Any: Serialised object
+        """
         if isinstance(obj, np.ndarray):
             return obj.tolist()
         return json.JSONEncoder.default(self, obj)
 
+
 class SWIFTProcessor:
+    """Enables processing of HDF5 files on the server.
+
+    Performs processing steps to return numpy arrays from HDF5 files as reuqested by users.
+    """
+
     def __init__(self, data_alias_map: dict):
-        """Class constructor
+        """Class constructor.
 
         Args:
-            data_alias_map (dict): _description_
+            data_alias_map (dict): Dictionary mapping dataset aliases to file paths.
         """
         self.data_alias_map = data_alias_map
 
-    def retrieve_filename(self, dataset_alias: str):
+    def retrieve_filename(self, dataset_alias: str | None) -> str | None:
         """Retrieve a full path to a file from an alias.
 
         Args:
-            dataset_alias (str): _description_
+            dataset_alias (str): Alias for a dataset
 
         Returns:
-            _type_: _description_
+            str | None : File path mapped to the alias
         """
-        return self.data_alias_map.get(dataset_alias)
+        if dataset_alias:
+            return self.data_alias_map.get(dataset_alias)
+        return None
 
-    def load_ndarray_from_json(self, json_array: str, data_type: str):
+    def load_ndarray_from_json(self, json_array: str, data_type: str) -> np.ndarray:
+        """Convert JSON to a Numpy NDArray.
 
+        Args:
+            json_array (str): Numpy array as JSON
+            data_type (str): Data type of elements in the original array
+
+        Returns:
+            np.ndarray: Numpy NDArray object
+        """
         loaded_json = json.loads(json_array)
-        restored_array = np.asarray(loaded_json, dtype=data_type)
+        return np.asarray(loaded_json, dtype=data_type)
 
-        return restored_array
+    def generate_json_from_ndarray(self, array: np.ndarray) -> dict[str, str]:
+        """Serialises Numpy NDArrays to JSON.
 
-    def generate_json_from_ndarray(self, array: np.ndarray):
+        Args:
+            array (np.ndarray): Numpy NDArray representing a dataset
+
+        Returns:
+            dict[str, str]: Dictionary containing serialised array and data type of array elements
+        """
         json_array = json.dumps(array, cls=NumpyEncoder)
         data_type = str(array.dtype)
         return {
@@ -59,10 +100,23 @@ class SWIFTProcessor:
         self,
         filename: str,
         field: str,
-        mask: None | np.ndarray,
+        mask: np.ndarray,
         mask_size: int,
         columns: None | np.lib.index_tricks.IndexExpression = None,
-    ):
+    ) -> np.array | None:
+        """Retrieve a masked array.
+
+        Args:
+            filename (str): Path to HDF5 file
+            field (str): Field to retrieve
+            mask (None | np.ndarray): Array mask
+            mask_size (int): Size of array mask
+            columns (None | np.lib.index_tricks.IndexExpression, optional):
+                Selector for columns in the case of multidim arrays. Defaults to None.
+
+        Returns:
+            np.array | None: Array with requested elements. Returns None if KeyError is raised.
+        """
         use_columns = columns is not None
 
         if not use_columns:
@@ -77,7 +131,7 @@ class SWIFTProcessor:
                 if output_size != 1 and not use_columns:
                     output_shape = (mask_size, output_size)
                 else:
-                    output_shape = mask_size
+                    output_shape = mask_size  # type: ignore
                 return read_ranges_from_file(
                     handle[field],
                     mask,
@@ -86,7 +140,7 @@ class SWIFTProcessor:
                     columns=columns,
                 )
             except KeyError:
-                print(f"Could not read {field}")
+                logger.error(f"Could not read {field}")
                 return None
 
     def get_array_unmasked(
@@ -94,7 +148,18 @@ class SWIFTProcessor:
         filename: str,
         field: str,
         columns: None | np.lib.index_tricks.IndexExpression = None,
-    ):
+    ) -> np.array:
+        """Retrieve an unmasked array.
+
+        Args:
+            filename (str): Path to HDF5 file
+            field (str): Field to retrieve
+            columns (None | np.lib.index_tricks.IndexExpression, optional):
+                Selector for columns in the case of multidim arrays. Defaults to None.
+
+        Returns:
+            np.array | None: Array with requested elements. Returns None if KeyError is raised.
+        """
         use_columns = columns is not None
 
         if not use_columns:
@@ -109,5 +174,5 @@ class SWIFTProcessor:
 
                 return result_array
             except KeyError:
-                print(f"Could not read {field}")
+                logger.error(f"Could not read {field}")
                 return None

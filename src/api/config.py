@@ -2,7 +2,7 @@
 """Module to define the main settings class for the API."""
 
 from loguru import logger
-from pydantic import Field, SecretStr, ValidationError
+from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
