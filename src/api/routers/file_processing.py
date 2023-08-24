@@ -57,11 +57,13 @@ async def get_masked_array_data(data_spec: SWIFTDataSpec) -> dict[str, str]:
         data_spec (SWIFTDataSpec):
             Dataset information required in POST request
 
-    Raises:
+    Raises
+    ------
         SWIFTDataSpecException:
             Exceptions raised for incorrectly formatted requests
 
-    Returns:
+    Returns
+    -------
         dict[str, str]:
             Numpy ndarray formatted as JSON. The resulting dictionary
             contains the array and the original data type.
@@ -110,11 +112,13 @@ async def get_unmasked_array_data(data_spec: SWIFTDataSpec) -> dict[str, str]:
         data_spec (SWIFTDataSpec):
             Dataset information required in POST request
 
-    Raises:
+    Raises
+    ------
         SWIFTDataSpecException:
             Exceptions raised for incorrectly formatted requests
 
-    Returns:
+    Returns
+    -------
         dict[str, str]:
             Numpy ndarray formatted as JSON. The resulting dictionary
             contains the array and the original data type.

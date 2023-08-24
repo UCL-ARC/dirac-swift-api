@@ -15,7 +15,8 @@ from swiftsimio.accelerated import read_ranges_from_file
 def get_dataset_alias_map():
     """Retrieve a dictionary mapping of aliases to file paths.
 
-    Returns:
+    Returns
+    -------
         _type_: _description_
     """
     return {
@@ -28,7 +29,7 @@ class NumpyEncoder(json.JSONEncoder):
     """Enables JSON serialisation of numpy objects."""
 
     def default(self, obj) -> Any:
-        """Default serialisation.
+        """Define default serialisation.
 
         Args:
             obj (_type_): Object to serialise
@@ -60,7 +61,8 @@ class SWIFTProcessor:
         Args:
             dataset_alias (str): Alias for a dataset
 
-        Returns:
+        Returns
+        -------
             str | None : File path mapped to the alias
         """
         if dataset_alias:
@@ -74,19 +76,21 @@ class SWIFTProcessor:
             json_array (str): Numpy array as JSON
             data_type (str): Data type of elements in the original array
 
-        Returns:
+        Returns
+        -------
             np.ndarray: Numpy NDArray object
         """
         loaded_json = json.loads(json_array)
         return np.asarray(loaded_json, dtype=data_type)
 
     def generate_json_from_ndarray(self, array: np.ndarray) -> dict[str, str]:
-        """Serialises Numpy NDArrays to JSON.
+        """Serialise Numpy NDArrays to JSON.
 
         Args:
             array (np.ndarray): Numpy NDArray representing a dataset
 
-        Returns:
+        Returns
+        -------
             dict[str, str]: Dictionary containing serialised array and data type of array elements
         """
         json_array = json.dumps(array, cls=NumpyEncoder)
@@ -114,7 +118,8 @@ class SWIFTProcessor:
             columns (None | np.lib.index_tricks.IndexExpression, optional):
                 Selector for columns in the case of multidim arrays. Defaults to None.
 
-        Returns:
+        Returns
+        -------
             np.array | None: Array with requested elements. Returns None if KeyError is raised.
         """
         use_columns = columns is not None
@@ -157,7 +162,8 @@ class SWIFTProcessor:
             columns (None | np.lib.index_tricks.IndexExpression, optional):
                 Selector for columns in the case of multidim arrays. Defaults to None.
 
-        Returns:
+        Returns
+        -------
             np.array | None: Array with requested elements. Returns None if KeyError is raised.
         """
         use_columns = columns is not None

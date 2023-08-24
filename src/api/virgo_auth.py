@@ -36,7 +36,8 @@ class SwiftAuthenticator:
         Return an appropriate status code to denote
         successful or unsuccessful auth
 
-        Returns:
+        Returns
+        -------
             int: Denotes status of authentication request
         """
         try:
@@ -60,7 +61,8 @@ class SwiftAuthenticator:
     def authenticate(self) -> int:
         """Authenticate against the VirgoDB server.
 
-        Returns:
+        Returns
+        -------
             int: HTTP status code of authentication request
         """
         session = Session()
@@ -73,7 +75,8 @@ class SwiftAuthenticator:
         Args:
             session (requests.session): Requests session object
 
-        Returns:
+        Returns
+        -------
             Session: Updated requests session object
         """
         logger.info(f"Saving cookies to {self.cookies_file}")
@@ -87,7 +90,8 @@ class SwiftAuthenticator:
         Args:
             session (Session): Current session object
 
-        Returns:
+        Returns
+        -------
             Session: Session object updated with previously saved cookies
         """
         if self.cookies_file.exists():

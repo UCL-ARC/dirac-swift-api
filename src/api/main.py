@@ -17,7 +17,8 @@ app.include_router(file_processing.router)
 async def ping() -> dict[str, str]:
     """Define an API route for testing purposes.
 
-    Returns:
+    Returns
+    -------
         dict[str, str]: Some example content
     """
     return {"ping": "pong"}

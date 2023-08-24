@@ -21,12 +21,13 @@ class Settings(BaseSettings):
 
 
 def get_settings(*args, **kwargs) -> Settings:
-    """Allows lazy loading of Settings.
+    """Enable lazy loading of Settings.
 
     Enables testing without environment variables.
 
 
-    Returns:
+    Returns
+    -------
         Settings: Settings object containing VirgoDB
             username, password and DB url. If settings fails to load,
             returns a Settings object showing missing fields.

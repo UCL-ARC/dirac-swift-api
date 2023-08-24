@@ -159,7 +159,7 @@ pep8-naming.classmethod-decorators = [
 ]
 
 [tool.ruff.pydocstyle]
-convention = "google"
+convention = "numpy"
 
 [tool.tomlsort]
 all = true
