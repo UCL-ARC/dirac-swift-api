@@ -8,6 +8,7 @@ from typing import Any
 
 import h5py
 import numpy as np
+import numpy.typing as npt
 from loguru import logger
 from swiftsimio.accelerated import read_ranges_from_file
 
@@ -69,7 +70,7 @@ class SWIFTProcessor:
             return self.data_alias_map.get(dataset_alias)
         return None
 
-    def load_ndarray_from_json(self, json_array: str, data_type: str) -> np.ndarray:
+    def load_ndarray_from_json(self, json_array: str, data_type: str) -> npt.NDArray:
         """Convert JSON to a Numpy NDArray.
 
         Args:
@@ -78,16 +79,16 @@ class SWIFTProcessor:
 
         Returns
         -------
-            np.ndarray: Numpy NDArray object
+            npt.NDArray: Numpy NDArray object
         """
         loaded_json = json.loads(json_array)
         return np.asarray(loaded_json, dtype=data_type)
 
-    def generate_json_from_ndarray(self, array: np.ndarray) -> dict[str, str]:
+    def generate_json_from_ndarray(self, array: npt.NDArray) -> dict[str, str]:
         """Serialise Numpy NDArrays to JSON.
 
         Args:
-            array (np.ndarray): Numpy NDArray representing a dataset
+            array (npt.NDArray): Numpy NDArray representing a dataset
 
         Returns
         -------
@@ -104,23 +105,23 @@ class SWIFTProcessor:
         self,
         filename: str,
         field: str,
-        mask: np.ndarray,
+        mask: npt.NDArray,
         mask_size: int,
         columns: None | np.lib.index_tricks.IndexExpression = None,
-    ) -> np.array | None:
+    ) -> npt.NDArray | None:
         """Retrieve a masked array.
 
         Args:
             filename (str): Path to HDF5 file
             field (str): Field to retrieve
-            mask (None | np.ndarray): Array mask
+            mask (None | npt.NDArray): Array mask
             mask_size (int): Size of array mask
             columns (None | np.lib.index_tricks.IndexExpression, optional):
                 Selector for columns in the case of multidim arrays. Defaults to None.
 
         Returns
         -------
-            np.array | None: Array with requested elements. Returns None if KeyError is raised.
+            npt.NDArray | None: Array with requested elements. Returns None if KeyError is raised.
         """
         use_columns = columns is not None
 

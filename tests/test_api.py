@@ -1,9 +1,8 @@
-import os
-
 from api.main import app
 from api.virgo_auth import SwiftAuthenticator
 from fastapi import status
 from fastapi.testclient import TestClient
+from jose import jwt
 
 client = TestClient(app)
 
@@ -15,91 +14,91 @@ def test_ping():
 
 
 def test_auth_success(mocker):
-    os.environ["VIRGO_USERNAME"] = "test_user"
-    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
-    os.environ["VIRGO_DB_URL"] = "http://test_url"
+    test_username = "test_user"
+    test_password = "test_pass"  # noqa: S105
+    test_db_url = "http://test_url"
 
-    mocker.patch("api.auth.SwiftAuthenticator.authenticate")
+    mocker.patch("api.virgo_auth.SwiftAuthenticator.authenticate")
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=200)
 
-    response = client.post("/auth")
+    payload = {
+        "username": test_username,
+        "password": test_password,
+        "db_url": test_db_url,
+    }
+    response = client.post("/token", data=payload)
     assert response.status_code == status.HTTP_200_OK
-    assert response.json()["auth_result_status"] == str(status.HTTP_200_OK)
-
-    del os.environ["VIRGO_USERNAME"]
-    del os.environ["VIRGO_PASSWORD"]
-    del os.environ["VIRGO_DB_URL"]
+    # Assert that we get the correct user from the token headers
+    assert jwt.get_unverified_claims(response.json())["sub"] == test_username
 
 
 def test_auth_failure_bad_auth(mocker):
-    os.environ["VIRGO_USERNAME"] = "test_user"
-    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
-    os.environ["VIRGO_DB_URL"] = "http://test_url"
+    test_username = "test_user"
+    test_password = "test_pass"  # noqa: S105
+    test_db_url = "http://test_url"
 
-    mocker.patch("api.auth.SwiftAuthenticator.authenticate")
+    mocker.patch("api.virgo_auth.SwiftAuthenticator.authenticate")
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=401)
 
-    response = client.post("/auth")
-
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()["auth_result_status"] == str(status.HTTP_401_UNAUTHORIZED)
-
-    del os.environ["VIRGO_USERNAME"]
-    del os.environ["VIRGO_PASSWORD"]
-    del os.environ["VIRGO_DB_URL"]
+    payload = {
+        "username": test_username,
+        "password": test_password,
+        "db_url": test_db_url,
+    }
+    response = client.post("/token", data=payload)
+    assert response.status_code == status.HTTP_401_UNAUTHORIZED
+    assert response.json()["detail"] == "Authentication failed"
 
 
 def test_auth_failure_bad_url(mocker):
-    os.environ["VIRGO_USERNAME"] = "test_user"
-    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
-    os.environ["VIRGO_DB_URL"] = "http://test_url"
+    test_username = "test_user"
+    test_password = "test_pass"  # noqa: S105
+    test_db_url = "http://test_url"
 
-    mocker.patch("api.auth.SwiftAuthenticator.authenticate")
+    mocker.patch("api.virgo_auth.SwiftAuthenticator.authenticate")
 
     mocker.patch.object(SwiftAuthenticator, "authenticate", return_value=404)
 
-    response = client.post("/auth?env=test")
+    payload = {
+        "username": test_username,
+        "password": test_password,
+        "db_url": test_db_url,
+    }
+    response = client.post("/token", data=payload)
 
-    assert response.status_code == status.HTTP_200_OK
-    assert response.json()["auth_result_status"] == str(status.HTTP_404_NOT_FOUND)
-
-    del os.environ["VIRGO_USERNAME"]
-    del os.environ["VIRGO_PASSWORD"]
-    del os.environ["VIRGO_DB_URL"]
+    assert response.status_code == status.HTTP_404_NOT_FOUND
+    assert response.json()["detail"] == "Incorrect URL provided"
 
 
 def test_settings_load_failure_missing_username():
-    os.environ["VIRGO_PASSWORD"] = "test_pass"  # noqa: S105
-    os.environ["VIRGO_DB_URL"] = "http://test_url"
-    response = client.post("/auth?env=test")
-    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert (
-        response.json()["detail"] == "Missing fields for authentication: ['username']"
-    )
+    test_password = "test_pass"  # noqa: S105
+    test_db_url = "http://test_url"
 
-    del os.environ["VIRGO_PASSWORD"]
-    del os.environ["VIRGO_DB_URL"]
+    payload = {
+        "password": test_password,
+        "db_url": test_db_url,
+    }
+    response = client.post("/token", data=payload)
+    assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+    assert "username" in response.json()["detail"][0]["loc"]
 
 
 def test_settings_load_failure_missing_password():
-    os.environ["VIRGO_USERNAME"] = "test_user"
-    os.environ["VIRGO_DB_URL"] = "http://test_url"
-    response = client.post("/auth?env=test")
+    test_user = "test_user"
+    test_db_url = "http://test_url"
+    payload = {
+        "username": test_user,
+        "db_url": test_db_url,
+    }
+    response = client.post("/token", data=payload)
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert (
-        response.json()["detail"] == "Missing fields for authentication: ['password']"
-    )
-
-    del os.environ["VIRGO_USERNAME"]
-    del os.environ["VIRGO_DB_URL"]
+    assert "password" in response.json()["detail"][0]["loc"]
 
 
 def test_settings_load_failure_missing_all():
-    response = client.post("/auth?env=test")
+    response = client.post("/token")
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
-    assert (
-        response.json()["detail"]
-        == "Missing fields for authentication: ['username', 'password']"
-    )
+    assert "username" in response.json()["detail"][0]["loc"]
+    assert "password" in response.json()["detail"][1]["loc"]
