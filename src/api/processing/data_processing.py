@@ -27,7 +27,7 @@ def get_dataset_alias_map():
 
 
 class NumpyEncoder(json.JSONEncoder):
-    """Enables JSON serialisation of numpy objects."""
+    """Enables JSON serialisation of numpy arrays."""
 
     def default(self, obj) -> Any:
         """Define default serialisation.

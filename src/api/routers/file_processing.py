@@ -1,4 +1,5 @@
 """Defines routes that return numpy arrays from HDF5 files."""
+import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, status
@@ -8,6 +9,8 @@ from pydantic import BaseModel
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
 from api.processing.masks import return_mask_boxsize
 from api.processing.units import retrieve_units_from_file
+from api.processing.metadata import create_metadata, RemoteSWIFTUnits
+from swiftsimio.reader import RemoteSWIFTDataset
 
 router = APIRouter()
 
@@ -202,10 +205,18 @@ async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict[str,
     )
 
 
-@router.get("/swiftmetadata")
-async def retrieve_metadata():
-    pass
+@router.post("/swiftmetadata")
+async def retrieve_metadata(data_spec: SWIFTBaseDataSpec):
+    processor = SWIFTProcessor(dataset_map)
+    file_path = get_file_path(data_spec, processor)
+    json_units = retrieve_units_from_file(file_path)
 
+    # I feel like there's a neater way of doing the below 2 lines
+    # and maybe some method that is less circular dependent
+    # think on this...
+    units_dict = RemoteSWIFTDataset.create_unyt_quantities_from_json(json_units)
+    swift_units = RemoteSWIFTUnits(units_dict)
+    return create_metadata(file_path, swift_units)
 
 @router.post("/swiftunits")
 async def retrieve_units(data_spec: SWIFTBaseDataSpec) -> dict:
