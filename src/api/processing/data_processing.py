@@ -92,10 +92,11 @@ class SWIFTProcessor:
 
         Returns
         -------
-            dict[str, str]: Dictionary containing serialised array and data type of array elements
+            dict[str, str]:
+                Dictionary containing serialised array, data type of array elements and byte order
         """
         json_array = json.dumps(array, cls=NumpyEncoder)
-        data_type = str(array.dtype)
+        data_type = array.dtype.str  # should preserve byte order
         return {
             "array": json_array,
             "dtype": data_type,
@@ -105,7 +106,8 @@ class SWIFTProcessor:
         self,
         filename: str,
         field: str,
-        mask: npt.NDArray,
+        mask_json: str,
+        mask_data_type: str,
         mask_size: int,
         columns: None | np.lib.index_tricks.IndexExpression = None,
     ) -> npt.NDArray | None:
@@ -123,6 +125,8 @@ class SWIFTProcessor:
         -------
             npt.NDArray | None: Array with requested elements. Returns None if KeyError is raised.
         """
+        mask = self.load_ndarray_from_json(mask_json, data_type=mask_data_type)
+
         use_columns = columns is not None
 
         if not use_columns:
