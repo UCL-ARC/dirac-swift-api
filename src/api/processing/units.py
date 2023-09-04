@@ -1,3 +1,4 @@
+"""Handle server-side unit calculation and conversion to JSON."""
 import json
 from typing import Any
 
@@ -42,7 +43,24 @@ class UnytEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def convert_swift_units_to_dict(swift_units: SWIFTUnits) -> str:
+def convert_swift_units_to_dict(swift_units: SWIFTUnits) -> dict:
+    """Convert unyt quantities to strings within a units dictionary.
+
+    Intended to aid JSON serialisation.
+
+    Args:
+        swift_units (SWIFTUnits):
+            A SWIFTUnits object containing unit information. Must provide
+            a dictionary representation via the `__dict__` attribute.
+
+    Raises
+    ------
+        SWIFTUnytException: Custom exception raised in case of conversion error.
+
+    Returns
+    -------
+        dict: Dictionary representing units using strings.
+    """
     swift_units_dict = swift_units.__dict__
 
     try:
@@ -56,21 +74,54 @@ def convert_swift_units_to_dict(swift_units: SWIFTUnits) -> str:
                     ].to_string()
     except KeyError as error:
         raise SWIFTUnytException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=error
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
         ) from error
 
     return swift_units_dict
 
 
-def retrieve_units_from_file(filename: str) -> str:
+def retrieve_units_json_compatible(filename: str) -> dict:
+    """Retrieve a JSON-serialisable units dictionary.
+
+    Args:
+        filename (str): Path to HDF5 file.
+
+    Returns
+    -------
+        dict: JSON-serialisable units dictionary.
+    """
     units = SWIFTUnits(filename)
-    units_dict = convert_swift_units_to_dict(units)
-    return json.dumps(units_dict)
+    return convert_swift_units_to_dict(units)
 
 
-def create_unyt_quantities_from_json(input_json: str) -> dict[str, Any]:
-    swift_unit_dict = json.loads(input_json)
+def retrieve_swiftunits_dict(filename: str) -> dict:
+    """Return a SWIFTUnits dictionary from HDF5 file.
 
+    Args:
+        filename (str): Path to HDF5 file.
+
+    Returns
+    -------
+        dict: Dictionary representation of SWIFTUnits object.
+    """
+    return SWIFTUnits(filename).__dict__
+
+
+def create_unyt_quantities(swift_unit_dict: dict) -> dict[str, Any]:
+    """Recreate unyt quantities within a dictionary of strings.
+
+    Args:
+        swift_unit_dict (dict): Unit dictionary containing string values.
+
+    Raises
+    ------
+        SWIFTUnytException: Exception raised in case of conversion error.
+
+    Returns
+    -------
+        dict[str, Any]: Dictionary containg `unyt_quantity`-type values.
+    """
     excluded_fields = ["filename", "units"]
     try:
         swift_unit_dict["units"] = {
@@ -87,7 +138,8 @@ def create_unyt_quantities_from_json(input_json: str) -> dict[str, Any]:
         }
     except KeyError as error:
         raise SWIFTUnytException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail=error
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
         ) from error
 
     return swift_unit_dict

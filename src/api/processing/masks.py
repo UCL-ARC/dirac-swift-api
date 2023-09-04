@@ -18,11 +18,6 @@ def return_mask_boxsize(filename: str) -> dict[str, str]:
     mask = sw.mask(filename)
     boxsize = mask.metadata.boxsize
 
-    boxsize_array = boxsize.value  # type: npt.NDArray
-    boxsize_units = str(boxsize.units)
-
-    array_json = processor.generate_json_from_ndarray(boxsize_array)
-
-    array_json.update({"units": str(boxsize_units)})
-
-    return array_json
+    payload = processor.generate_dict_from_ndarray(boxsize)
+    payload.update({"units": str(boxsize.units)})
+    return payload

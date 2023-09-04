@@ -4,7 +4,6 @@ This module calls SWIFTsimIO functions and creates numpy arrays from HDF5 files
 read on the server.
 """
 import json
-from typing import Any
 
 import h5py
 import numpy as np
@@ -26,20 +25,8 @@ def get_dataset_alias_map():
     }
 
 
-class NumpyEncoder(json.JSONEncoder):
-    """Enables JSON serialisation of numpy arrays."""
-
-    def default(self, obj) -> Any:
-        """Define default serialisation.
-
-        Args:
-            obj (_type_): Object to serialise
-        Returns:
-            Any: Serialised object
-        """
-        if isinstance(obj, np.ndarray):
-            return obj.tolist()
-        return json.JSONEncoder.default(self, obj)
+class SWIFTProcessorError(Exception):
+    """Custom exception for data aprocessing errors."""
 
 
 class SWIFTProcessor:
@@ -70,7 +57,11 @@ class SWIFTProcessor:
             return self.data_alias_map.get(dataset_alias)
         return None
 
-    def load_ndarray_from_json(self, json_array: str, data_type: str) -> npt.NDArray:
+    def load_ndarray_from_json(
+        self,
+        json_array: str,
+        data_type: str | None,
+    ) -> npt.NDArray:
         """Convert JSON to a Numpy NDArray.
 
         Args:
@@ -84,8 +75,8 @@ class SWIFTProcessor:
         loaded_json = json.loads(json_array)
         return np.asarray(loaded_json, dtype=data_type)
 
-    def generate_json_from_ndarray(self, array: npt.NDArray) -> dict[str, str]:
-        """Serialise Numpy NDArrays to JSON.
+    def generate_dict_from_ndarray(self, array: npt.NDArray) -> dict[str, str]:
+        """Convert numpy-based arrays to JSON-serialisable objects.
 
         Args:
             array (npt.NDArray): Numpy NDArray representing a dataset
@@ -95,10 +86,9 @@ class SWIFTProcessor:
             dict[str, str]:
                 Dictionary containing serialised array, data type of array elements and byte order
         """
-        json_array = json.dumps(array, cls=NumpyEncoder)
         data_type = array.dtype.str  # should preserve byte order
         return {
-            "array": json_array,
+            "array": array.tolist(),
             "dtype": data_type,
         }
 
@@ -106,8 +96,8 @@ class SWIFTProcessor:
         self,
         filename: str,
         field: str,
-        mask_json: str,
-        mask_data_type: str,
+        mask_json: str | None,
+        mask_data_type: str | None,
         mask_size: int,
         columns: None | np.lib.index_tricks.IndexExpression = None,
     ) -> npt.NDArray | None:
@@ -125,6 +115,9 @@ class SWIFTProcessor:
         -------
             npt.NDArray | None: Array with requested elements. Returns None if KeyError is raised.
         """
+        if not mask_json:
+            msg = "No mask provided!"
+            raise SWIFTProcessorError(msg)
         mask = self.load_ndarray_from_json(mask_json, data_type=mask_data_type)
 
         use_columns = columns is not None

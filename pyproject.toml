@@ -97,6 +97,7 @@ ignore = [
     "D212", # multi-line-summary-first-line
     "D417", # argument description in docstring (unreliable),
     "PGH003", # Use specific rule codes when ignoring type issues
+    "PLR0911", # Too many return statements (10 > 6)
     "PLR0913", # Too many arguments to function call
 ]
 line-length = 100

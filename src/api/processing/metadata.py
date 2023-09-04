@@ -1,15 +1,24 @@
-from swiftsimio.reader import SWIFTMetadata, RemoteSWIFTUnits, MassTable, SWIFTParticleTypeMetadata
-from typing import Any
+"""Perform server side metadata processing."""
 import json
-import numpy as np
-from unyt import unyt_quantity
 from datetime import datetime
+from typing import Any
 
-class RemoteSWIFTMetadataException(Exception):
-    pass
+import numpy as np
+from swiftsimio.reader import (
+    MassTable,
+    RemoteSWIFTUnits,
+    SWIFTMetadata,
+    SWIFTParticleTypeMetadata,
+)
+from unyt import unyt_quantity
+
+
+class RemoteSWIFTMetadataError(Exception):
+    """Custom error class for metadata serialisation."""
+
 
 class SWIFTMetadataEncoder(json.JSONEncoder):
-    """Enables JSON serialisation of numpy arrays."""
+    """Enable JSON serialisation of numpy arrays."""
 
     def default(self, obj) -> Any:
         """Define default serialisation.
@@ -40,8 +49,21 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def create_metadata(filename: str, units: RemoteSWIFTUnits):
+def create_metadata(filename: str, units: RemoteSWIFTUnits) -> dict:
+    """Create JSON-serialisable metadata dictionary.
 
+    Args:
+        filename (str): File path of specified HDF5 file
+        units (RemoteSWIFTUnits): Units object
+
+    Raises
+    ------
+        RemoteSWIFTMetadataError: Raised in case of failed JSON serialisation.
+
+    Returns
+    -------
+        dict: Dictionary containg metadata.
+    """
     metadata = SWIFTMetadata(filename, units)
 
     metadata_dict = metadata.__dict__
@@ -52,6 +74,5 @@ def create_metadata(filename: str, units: RemoteSWIFTUnits):
         metadata_object = json.loads(json_metadata)
         return metadata_object
     except TypeError as error:
-        message = f"Error serialising JSON: {str(error)}"
-        raise RemoteSWIFTMetadataException(message) from error
-
+        message = f"Error serialising JSON: {error!s}"
+        raise RemoteSWIFTMetadataError(message) from error

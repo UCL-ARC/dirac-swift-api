@@ -1,16 +1,17 @@
 """Defines routes that return numpy arrays from HDF5 files."""
-import json
 from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+from swiftsimio.reader import RemoteSWIFTUnits
 
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
 from api.processing.masks import return_mask_boxsize
-from api.processing.units import retrieve_units_from_file
-from api.processing.metadata import create_metadata, RemoteSWIFTUnits
-from swiftsimio.reader import RemoteSWIFTDataset
+from api.processing.metadata import create_metadata
+from api.processing.units import (
+    retrieve_swiftunits_dict,
+    retrieve_units_json_compatible,
+)
 
 router = APIRouter()
 
@@ -30,7 +31,7 @@ class SWIFTBaseDataSpec(BaseModel):
     filename: str | None = None
 
 
-class SWIFTMaskedDataSpec(BaseModel):
+class SWIFTMaskedDataSpec(SWIFTBaseDataSpec):
     """Data required in each request for masked data.
 
     A Pydantic model to validate HTTP POST requests.
@@ -42,11 +43,13 @@ class SWIFTMaskedDataSpec(BaseModel):
     alias: str | None = None
     filename: str | None = None
     field: str
-    boxsize_coefficients: list[float] = None
+    boxsize_coefficients: str
+    mask_data_type: str | None = None
+    mask_size: int
     columns: None | list[int] = None
 
 
-class SWIFTUnmaskedDataSpec(BaseModel):
+class SWIFTUnmaskedDataSpec(SWIFTBaseDataSpec):
     """Data required in each request for unmasked data.
 
     A Pydantic model to validate HTTP POST requests.
@@ -82,17 +85,25 @@ class SWIFTDataSpecException(HTTPException):
 
 
 @router.post("/mask")
-async def get_unmasked_array_data(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
+async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
+    """Retrieve mask dimensions.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Basic data specification indicating filename or alias.
+
+    Returns
+    -------
+        dict[str, str]: Dictionary containing boxsize array, data type and unyt units.
+    """
     processor = SWIFTProcessor(dataset_map)
     file_path = get_file_path(data_spec, processor)
 
-    boxsize = return_mask_boxsize(file_path)
-
-    return boxsize
+    return return_mask_boxsize(file_path)
 
 
 def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> str:
-    """Retrieve a file path from a data spec object
+    """Retrieve a file path from a data spec object.
+
     Args:
         data_spec (SWIFTBaseDataSpec): SWIFT minimal data spec object
         processor (SWIFTProcessor): SWIFTProcessor object.
@@ -160,10 +171,12 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str
         file_path,
         data_spec.field,
         data_spec.boxsize_coefficients,
+        data_spec.mask_data_type,
+        data_spec.mask_size,
         data_spec.columns,
     )
 
-    return processor.generate_json_from_ndarray(
+    return processor.generate_dict_from_ndarray(
         masked_array,
     )
 
@@ -200,28 +213,44 @@ async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict[str,
         data_spec.columns,
     )
 
-    return processor.generate_json_from_ndarray(
+    return processor.generate_dict_from_ndarray(
         unmasked_array,
     )
 
 
 @router.post("/swiftmetadata")
-async def retrieve_metadata(data_spec: SWIFTBaseDataSpec):
+async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
+    """Retrieve metadata from a file path.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Base dataspec specifying file path or alias.
+
+    Returns
+    -------
+        dict: Metadata for specified file
+    """
     processor = SWIFTProcessor(dataset_map)
     file_path = get_file_path(data_spec, processor)
-    json_units = retrieve_units_from_file(file_path)
+    units = retrieve_swiftunits_dict(file_path)
 
-    # I feel like there's a neater way of doing the below 2 lines
-    # and maybe some method that is less circular dependent
-    # think on this...
-    units_dict = RemoteSWIFTDataset.create_unyt_quantities_from_json(json_units)
-    swift_units = RemoteSWIFTUnits(units_dict)
+    swift_units = RemoteSWIFTUnits(units)
+
     return create_metadata(file_path, swift_units)
+
 
 @router.post("/swiftunits")
 async def retrieve_units(data_spec: SWIFTBaseDataSpec) -> dict:
+    """Retrieve units for the specified file.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Base dataspec specifying file path or alias.
+
+    Returns
+    -------
+        dict: Unit data for specified file
+    """
     processor = SWIFTProcessor(dataset_map)
 
     file_path = get_file_path(data_spec, processor)
 
-    return JSONResponse(retrieve_units_from_file(file_path))
+    return retrieve_units_json_compatible(file_path)
