@@ -43,15 +43,14 @@ class UnytEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def convert_swift_units_to_dict(swift_units: SWIFTUnits) -> dict:
+def convert_swift_units_dict_types(swift_units_dict: dict) -> dict:
     """Convert unyt quantities to strings within a units dictionary.
 
     Intended to aid JSON serialisation.
 
     Args:
-        swift_units (SWIFTUnits):
-            A SWIFTUnits object containing unit information. Must provide
-            a dictionary representation via the `__dict__` attribute.
+        swift_units_dict (SWIFTUnits):
+            A dictionary representation of a SWIFTUnits object containing unit information.
 
     Raises
     ------
@@ -61,8 +60,6 @@ def convert_swift_units_to_dict(swift_units: SWIFTUnits) -> dict:
     -------
         dict: Dictionary representing units using strings.
     """
-    swift_units_dict = swift_units.__dict__
-
     try:
         for key in swift_units_dict:
             if isinstance(swift_units_dict[key], unyt_quantity):
@@ -92,7 +89,7 @@ def retrieve_units_json_compatible(filename: str) -> dict:
         dict: JSON-serialisable units dictionary.
     """
     units = SWIFTUnits(filename)
-    return convert_swift_units_to_dict(units)
+    return convert_swift_units_dict_types(units)
 
 
 def retrieve_swiftunits_dict(filename: str) -> dict:
