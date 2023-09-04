@@ -55,13 +55,42 @@ def test_convert_swift_units_dict_types_failure():
         units.convert_swift_units_dict_types(test_units_dict)
 
 
-def test_retrieve_units_json_compatible():
-    pass
+def test_create_unyt_quantities_success():
+    test_dict = {
+        "filename": "/a/test/file/path",
+        "units": {
+            "Unit current in cgs (U_I)": "1.0 statA",
+            "Unit length in cgs (U_L)": "1e+24 cm",
+            "Unit mass in cgs (U_M)": "1.9e+43 g",
+            "Unit temperature in cgs (U_T)": "1.0 K",
+            "Unit time in cgs (U_t)": "1.09e+19 s",
+        },
+        "mass": "10000000000.0 Msun",
+        "length": "1.0 Mpc",
+        "time": "1000.0 Gyr",
+        "current": "1.0 statA",
+        "temperature": "1.0 K",
+    }
+
+    unyt_quantity_dict = units.create_unyt_quantities(test_dict)
+
+    for key, value in unyt_quantity_dict.items():
+        if isinstance(value, dict):
+            for _subkey, subvalue in unyt_quantity_dict[key].items():
+                assert isinstance(subvalue, unyt_quantity)
+        elif key != "filename":
+            assert isinstance(value, unyt_quantity)
 
 
-def test_retrieve_swiftunits_dict():
-    pass
+def test_create_unyt_quantities_failure():
+    test_dict = {
+        "filename": "/a/test/file/path",
+        "mass": "10000000000.0 Msun",
+        "length": "1.0 Mpc",
+        "time": "1000.0 Gyr",
+        "current": "1.0 statA",
+        "temperature": "1.0 K",
+    }
 
-
-def test_create_unyt_quantities():
-    pass
+    with pytest.raises(units.SWIFTUnytException):
+        units.create_unyt_quantities(test_dict)
