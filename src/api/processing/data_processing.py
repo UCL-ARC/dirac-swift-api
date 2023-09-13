@@ -20,8 +20,8 @@ def get_dataset_alias_map():
         _type_: _description_
     """
     return {
-        "downloaded_file": "/Users/hmoss/dirac-swift-api/sample_data/colibre_0023.hdf5",
-        "sample_file": "/Users/hmoss/dirac-swift-api/sample_data/cosmo_volume_example.hdf5",
+        "downloaded_file": "/path/to/downloaded_file",
+        "sample_file": "/path/to/sample_file",
     }
 
 
