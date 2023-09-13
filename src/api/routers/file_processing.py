@@ -101,7 +101,7 @@ async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
     return return_mask_boxsize(file_path)
 
 
-def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> str:
+def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Path:
     """Retrieve a file path from a data spec object.
 
     Args:
@@ -114,7 +114,7 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> st
 
     Returns
     -------
-        str: Path to requested file
+        Path: Path to requested file
     """
     file_path = None
     if data_spec.filename:
@@ -131,7 +131,7 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> st
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=f"SWIFT filename not found at the provided path: {file_path}.",
         )
-    return file_path
+    return Path(file_path)
 
 
 @router.post("/masked_dataset")
@@ -158,7 +158,7 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str
     """
     processor = SWIFTProcessor(dataset_map)
 
-    file_path = get_file_path(data_spec, processor)
+    file_path = str(get_file_path(data_spec, processor).resolve())
 
     if not data_spec.boxsize_coefficients:
         raise SWIFTDataSpecException(
@@ -205,7 +205,7 @@ async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict[str,
     """
     processor = SWIFTProcessor(dataset_map)
 
-    file_path = get_file_path(data_spec, processor)
+    file_path = str(get_file_path(data_spec, processor).resolve())
 
     unmasked_array = processor.get_array_unmasked(
         file_path,
@@ -230,7 +230,7 @@ async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
         dict: Metadata for specified file
     """
     processor = SWIFTProcessor(dataset_map)
-    file_path = get_file_path(data_spec, processor)
+    file_path = str(get_file_path(data_spec, processor).resolve())
     units = retrieve_swiftunits_dict(file_path)
 
     swift_units = RemoteSWIFTUnits(units)
@@ -251,6 +251,6 @@ async def retrieve_units(data_spec: SWIFTBaseDataSpec) -> dict:
     """
     processor = SWIFTProcessor(dataset_map)
 
-    file_path = get_file_path(data_spec, processor)
+    file_path = str(get_file_path(data_spec, processor).resolve())
 
     return retrieve_units_json_compatible(file_path)

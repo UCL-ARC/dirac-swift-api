@@ -22,10 +22,11 @@ class RemoteSWIFTUnits:
         """
         if unit_dict is not None:
             for key, value in unit_dict.items():
-                setattr(self, key, unyt_quantity.from_string(value))
                 if isinstance(unit_dict[key], dict):
                     for nested_key, nested_value in unit_dict[key].items():
                         setattr(self, nested_key, nested_value)
+                else:
+                    setattr(self, key, unyt_quantity.from_string(value))
 
 
 class SWIFTUnytException(HTTPException):
