@@ -16,12 +16,6 @@ def mock_successful_response(mocker):
 @pytest.fixture()
 def mock_settings():
     test_url = "test_url"
-    access_token_expiry_mins = 60
-    secret_key = "test_key"  # noqa: S105
-    algorithm = "HS256"
     return Settings(
         db_url=test_url,
-        access_token_expiry_mins=access_token_expiry_mins,
-        secret_key=secret_key,
-        algorithm=algorithm,
     )

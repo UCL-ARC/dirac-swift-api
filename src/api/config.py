@@ -10,9 +10,6 @@ class Settings(BaseSettings):
     """Class to store typed settings via Pydantic."""
 
     db_url: str = "http://virgodb.dur.ac.uk:8080/Eagle/"
-    access_token_expiry_mins: int
-    secret_key: str
-    algorithm: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
