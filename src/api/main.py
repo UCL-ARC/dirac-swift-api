@@ -3,13 +3,12 @@
 from fastapi import FastAPI
 from loguru import logger
 
-from api.routers import auth, file_processing
+from api.routers import file_processing
 
 logger.info("API starting")
 
 app = FastAPI()
 
-app.include_router(auth.router)
 app.include_router(file_processing.router)
 
 

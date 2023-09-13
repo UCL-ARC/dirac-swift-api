@@ -3,12 +3,12 @@ from pathlib import Path
 
 from fastapi import APIRouter, HTTPException, status
 from pydantic import BaseModel
-from swiftsimio.reader import RemoteSWIFTUnits
 
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
 from api.processing.masks import return_mask_boxsize
 from api.processing.metadata import create_metadata
 from api.processing.units import (
+    RemoteSWIFTUnits,
     retrieve_swiftunits_dict,
     retrieve_units_json_compatible,
 )

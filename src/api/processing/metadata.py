@@ -6,11 +6,12 @@ from typing import Any
 import numpy as np
 from swiftsimio.reader import (
     MassTable,
-    RemoteSWIFTUnits,
     SWIFTMetadata,
     SWIFTParticleTypeMetadata,
 )
 from unyt import unyt_quantity
+
+from api.processing.units import RemoteSWIFTUnits
 
 
 class RemoteSWIFTMetadataError(Exception):

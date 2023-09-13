@@ -7,6 +7,27 @@ from swiftsimio.reader import SWIFTUnits
 from unyt import unyt_quantity
 
 
+class RemoteSWIFTUnits:
+    """Create SWIFTUnits-type objects.
+
+    Converts dictionaries of strings to dictionaries of type `unyt_quantity`
+    matching the SWIFTUnits type.
+    """
+
+    def __init__(self, unit_dict: dict | None = None):
+        """Class constructor.
+
+        Args:
+            unit_dict (_type_, optional): Optional dictionary of strings. Defaults to None.
+        """
+        if unit_dict is not None:
+            for key, value in unit_dict.items():
+                setattr(self, key, unyt_quantity.from_string(value))
+                if isinstance(unit_dict[key], dict):
+                    for nested_key, nested_value in unit_dict[key].items():
+                        setattr(self, nested_key, nested_value)
+
+
 class SWIFTUnytException(HTTPException):
     """Custom exception for incorrectly formatted POSTs.
 
