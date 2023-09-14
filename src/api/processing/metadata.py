@@ -36,7 +36,7 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         if isinstance(obj, np.bytes_):
             return obj.decode("UTF-8")
         if isinstance(obj, RemoteSWIFTUnits):
-            return repr(obj)
+            return repr(obj.__dict__)
         if isinstance(obj, MassTable):
             return repr(obj)
         if isinstance(obj, SWIFTParticleTypeMetadata):
