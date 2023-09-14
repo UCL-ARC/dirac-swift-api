@@ -26,7 +26,7 @@ class RemoteSWIFTUnits:
                     for nested_key, nested_value in unit_dict[key].items():
                         setattr(self, nested_key, nested_value)
                 else:
-                    setattr(self, key, unyt_quantity.from_string(value))
+                    setattr(self, key, value)
 
 
 class SWIFTUnytException(HTTPException):
@@ -111,7 +111,7 @@ def retrieve_units_json_compatible(filename: str) -> dict:
         dict: JSON-serialisable units dictionary.
     """
     units = SWIFTUnits(filename)
-    return convert_swift_units_dict_types(units)
+    return convert_swift_units_dict_types(units.__dict__)
 
 
 def retrieve_swiftunits_dict(filename: str) -> dict:
