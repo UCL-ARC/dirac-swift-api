@@ -1,7 +1,7 @@
 """Defines routes that return numpy arrays from HDF5 files."""
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Response, status
 from pydantic import BaseModel
 
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
@@ -235,7 +235,9 @@ async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
 
     swift_units = RemoteSWIFTUnits(units)
 
-    return create_metadata(file_path, swift_units)
+    serialised_metadata = create_metadata(file_path, swift_units)
+
+    return Response(content=serialised_metadata, media_type="application/octet-stream")
 
 
 @router.post("/swiftunits")

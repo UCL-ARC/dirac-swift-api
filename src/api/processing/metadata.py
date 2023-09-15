@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from typing import Any
 
+import cloudpickle
 import numpy as np
 from swiftsimio.reader import (
     MassTable,
@@ -67,13 +68,9 @@ def create_metadata(filename: str, units: RemoteSWIFTUnits) -> dict:
     """
     metadata = SWIFTMetadata(filename, units)
 
-    metadata_dict = metadata.__dict__
-
     try:
-        # Enforce JSON serialisability in this step
-        json_metadata = json.dumps(metadata_dict, cls=SWIFTMetadataEncoder)
-        metadata_object = json.loads(json_metadata)
-        return metadata_object
-    except TypeError as error:
-        message = f"Error serialising JSON: {error!s}"
+        return cloudpickle.dumps(metadata)
+
+    except Exception as error:  # noqa: BLE001
+        message = f"Error serialising metadata: {error!s}"
         raise RemoteSWIFTMetadataError(message) from error
