@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Response, status
 from pydantic import BaseModel
 
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
-from api.processing.masks import return_mask_boxsize
+from api.processing.masks import return_mask, return_mask_boxsize
 from api.processing.metadata import create_metadata
 from api.processing.units import (
     RemoteSWIFTUnits,
@@ -84,7 +84,7 @@ class SWIFTDataSpecException(HTTPException):
         super().__init__(status_code, detail=detail)
 
 
-@router.post("/mask")
+@router.post("/mask_boxsize")
 async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
     """Retrieve mask dimensions.
 
@@ -99,6 +99,23 @@ async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
     file_path = get_file_path(data_spec, processor)
 
     return return_mask_boxsize(file_path)
+
+
+@router.post("/mask")
+async def get_mask(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
+    """Retrieve SWIFTMask object.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Basic data specification indicating filename or alias.
+
+    Returns
+    -------
+        dict[str, str]: Dictionary containing boxsize array, data type and unyt units.
+    """
+    processor = SWIFTProcessor(dataset_map)
+    file_path = get_file_path(data_spec, processor)
+
+    return return_mask(file_path)
 
 
 def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Path:
