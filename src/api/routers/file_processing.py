@@ -40,13 +40,12 @@ class SWIFTMaskedDataSpec(SWIFTBaseDataSpec):
         BaseModel (_type_): Pydantic BaseModel
     """
 
-    alias: str | None = None
-    filename: str | None = None
+    filename: str
     field: str
-    boxsize_coefficients: str
+    mask_array_json: str
     mask_data_type: str | None = None
     mask_size: int
-    columns: None | list[int] = None
+    columns: None | int = None
 
 
 class SWIFTUnmaskedDataSpec(SWIFTBaseDataSpec):
@@ -58,10 +57,9 @@ class SWIFTUnmaskedDataSpec(SWIFTBaseDataSpec):
         BaseModel (_type_): Pydantic BaseModel
     """
 
-    alias: str | None = None
     filename: str | None = None
     field: str
-    columns: None | list[int] = None
+    columns: None | list[str] = None
 
 
 class SWIFTDataSpecException(HTTPException):
@@ -99,6 +97,21 @@ async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
     file_path = get_file_path(data_spec, processor)
 
     return return_mask_boxsize(file_path)
+
+
+@router.post("/filepath")
+async def get_filepath_from_alias(data_spec: SWIFTBaseDataSpec) -> Path:
+    """Retrieve full file path.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Basic data specification indicating filename or alias.
+
+    Returns
+    -------
+        Path: Path object displaying full file path on the server.
+    """
+    processor = SWIFTProcessor(dataset_map)
+    return get_file_path(data_spec, processor)
 
 
 @router.post("/mask")
@@ -152,7 +165,7 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Pa
 
 
 @router.post("/masked_dataset")
-async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str]:
+async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict:
     """Retrieve a masked array from a dataset.
 
     Applies masking to an array generated from the HDF5 file
@@ -177,7 +190,7 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str
 
     file_path = str(get_file_path(data_spec, processor).resolve())
 
-    if not data_spec.boxsize_coefficients:
+    if not data_spec.mask_array_json:
         raise SWIFTDataSpecException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="No mask information found. \
@@ -187,7 +200,7 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str
     masked_array = processor.get_array_masked(
         file_path,
         data_spec.field,
-        data_spec.boxsize_coefficients,
+        data_spec.mask_array_json,
         data_spec.mask_data_type,
         data_spec.mask_size,
         data_spec.columns,
@@ -199,7 +212,7 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict[str, str
 
 
 @router.post("/unmasked_dataset")
-async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict[str, str]:
+async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict:
     """Retrieve an unmasked array from a dataset.
 
     Returns the array generated from the HDF5 file

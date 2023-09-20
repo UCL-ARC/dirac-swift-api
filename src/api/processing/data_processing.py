@@ -105,8 +105,9 @@ class SWIFTProcessor:
 
         Args:
             filename (str): Path to HDF5 file
-            field (str): Field to retrieve
-            mask (None | npt.NDArray): Array mask
+            field (str): Field path to retrieve
+            mask_json (None | str): String representation of array mask
+            mask_data_type (str | None): Optionally include the original mask array dtype
             mask_size (int): Size of array mask
             columns (None | np.lib.index_tricks.IndexExpression, optional):
                 Selector for columns in the case of multidim arrays. Defaults to None.
