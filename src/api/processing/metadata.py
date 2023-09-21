@@ -51,7 +51,43 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def create_metadata(filename: str, units: RemoteSWIFTUnits) -> dict:
+def create_swift_metadata(filename: str, units: RemoteSWIFTUnits) -> bytes:
+    """Return a SWIFTMetadata object, serialised with pickle.
+
+    Args:
+        filename (str): File path of specified HDF5 file
+        units (RemoteSWIFTUnits): Units object.
+
+    Raises
+    ------
+        RemoteSWIFTMetadataError: Raised in case of failed JSON serialisation.
+
+    Returns
+    -------
+        bytes: Pickled SWIFTMetadata object
+    """
+    metadata = SWIFTMetadata(filename, units)
+
+    try:
+        return cloudpickle.dumps(metadata)
+
+    except Exception as error:  # noqa: BLE001
+        message = f"Error serialising metadata: {error!s}"
+        raise RemoteSWIFTMetadataError(message) from error
+
+
+def reprocess_json(metadata_dictionary: dict, encoder: type[json.JSONEncoder]):
+    """Encode and decode a dictionary to JSON to ensure correct formatting.
+
+    Args:
+        metadata_dictionary (dict): Dictionary representation of SWIFT Metadata
+        encoder (json.JSONEncoder): Encoder object to dictate serialisation
+    """
+    json_metadata = json.dumps(metadata_dictionary, cls=encoder)
+    return json.loads(json_metadata)
+
+
+def create_swift_metadata_dict(filename: str, units: RemoteSWIFTUnits) -> dict:
     """Create JSON-serialisable metadata dictionary.
 
     Args:
@@ -68,9 +104,10 @@ def create_metadata(filename: str, units: RemoteSWIFTUnits) -> dict:
     """
     metadata = SWIFTMetadata(filename, units)
 
-    try:
-        return cloudpickle.dumps(metadata)
+    metadata_dict = metadata.__dict__
 
-    except Exception as error:  # noqa: BLE001
-        message = f"Error serialising metadata: {error!s}"
-        raise RemoteSWIFTMetadataError(message) from error
+    try:
+        return reprocess_json(metadata_dict, SWIFTMetadataEncoder)
+    except TypeError as type_error:
+        message = f"Error serialising JSON: {type_error}"
+        raise RemoteSWIFTMetadataError(message) from type_error

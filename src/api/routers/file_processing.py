@@ -6,7 +6,7 @@ from pydantic import BaseModel
 
 from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
 from api.processing.masks import return_mask, return_mask_boxsize
-from api.processing.metadata import create_metadata
+from api.processing.metadata import create_swift_metadata
 from api.processing.units import (
     RemoteSWIFTUnits,
     retrieve_swiftunits_dict,
@@ -115,7 +115,7 @@ async def get_filepath_from_alias(data_spec: SWIFTBaseDataSpec) -> Path:
 
 
 @router.post("/mask")
-async def get_mask(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
+async def get_mask(data_spec: SWIFTBaseDataSpec) -> bytes:
     """Retrieve SWIFTMask object.
 
     Args:
@@ -123,7 +123,7 @@ async def get_mask(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
 
     Returns
     -------
-        dict[str, str]: Dictionary containing boxsize array, data type and unyt units.
+        bytes: Pickled SWIFTMask object.
     """
     processor = SWIFTProcessor(dataset_map)
     file_path = get_file_path(data_spec, processor)
@@ -265,7 +265,7 @@ async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
 
     swift_units = RemoteSWIFTUnits(units)
 
-    serialised_metadata = create_metadata(file_path, swift_units)
+    serialised_metadata = create_swift_metadata(file_path, swift_units)
 
     return Response(content=serialised_metadata, media_type="application/octet-stream")
 

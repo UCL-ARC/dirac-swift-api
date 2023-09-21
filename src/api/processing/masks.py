@@ -26,7 +26,7 @@ def return_mask_boxsize(filename: Path) -> dict[str, str]:
     return payload
 
 
-def return_mask(filename: Path) -> dict[str, str]:
+def return_mask(filename: Path) -> bytes:
     """Retrieve the boxsize object from an object mask.
 
     Args:
@@ -34,7 +34,7 @@ def return_mask(filename: Path) -> dict[str, str]:
 
     Returns
     -------
-        dict[str, str]: Dictionary containing boxsize array, data type and unyt units.
+        bytes: Pickled SWIFTMask object.
     """
     SWIFTProcessor(get_dataset_alias_map())
     mask = sw.mask(str(filename.resolve()))
