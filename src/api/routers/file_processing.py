@@ -59,7 +59,7 @@ class SWIFTUnmaskedDataSpec(SWIFTBaseDataSpec):
 
     filename: str | None = None
     field: str
-    columns: None | list[str] = None
+    columns: None | int = None
 
 
 class SWIFTDataSpecException(HTTPException):

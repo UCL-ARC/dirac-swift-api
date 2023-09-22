@@ -17,11 +17,10 @@ def return_mask_boxsize(filename: Path) -> dict[str, str]:
     -------
         dict[str, str]: Dictionary containing boxsize array, data type and unyt units.
     """
-    processor = SWIFTProcessor(get_dataset_alias_map())
     mask = sw.mask(str(filename.resolve()))
     boxsize = mask.metadata.boxsize
 
-    payload = processor.generate_dict_from_ndarray(boxsize)
+    payload = SWIFTProcessor.generate_dict_from_ndarray(boxsize)
     payload.update({"units": str(boxsize.units)})
     return payload
 

@@ -51,14 +51,20 @@ class SWIFTProcessor:
 
         Returns
         -------
-            str | None : File path mapped to the alias
+            str: File path mapped to the alias
         """
         if dataset_alias:
-            return self.data_alias_map.get(dataset_alias)
+            mapped_filename = self.data_alias_map.get(dataset_alias)
+
+            if not mapped_filename:
+                msg = "Dataset alias not found in dataset map."
+                raise (SWIFTProcessorError(msg))
+
+            return mapped_filename
         return None
 
+    @staticmethod
     def load_ndarray_from_json(
-        self,
         json_array: str,
         data_type: str | None,
     ) -> npt.NDArray:
@@ -73,9 +79,18 @@ class SWIFTProcessor:
             npt.NDArray: Numpy NDArray object
         """
         loaded_json = json.loads(json_array)
-        return np.asarray(loaded_json, dtype=data_type)
 
-    def generate_dict_from_ndarray(self, array: npt.NDArray) -> dict[str, str]:
+        try:
+            return np.asarray(loaded_json, dtype=data_type)
+        except TypeError as dtype_error:
+            message = f"Invalid data type provided for conversion to numpy array. {dtype_error}"
+            raise (SWIFTProcessorError(message)) from dtype_error
+        except ValueError as array_value_error:
+            message = f"Invalid array data for numpy.asarray(). {array_value_error}"
+            raise (SWIFTProcessorError(message)) from array_value_error
+
+    @staticmethod
+    def generate_dict_from_ndarray(array: npt.NDArray) -> dict[str, str]:
         """Convert numpy-based arrays to JSON-serialisable objects.
 
         Args:
@@ -119,7 +134,10 @@ class SWIFTProcessor:
         if not mask_json:
             msg = "No mask provided!"
             raise SWIFTProcessorError(msg)
-        mask = self.load_ndarray_from_json(mask_json, data_type=mask_data_type)
+        mask = SWIFTProcessor.load_ndarray_from_json(
+            mask_json,
+            data_type=mask_data_type,
+        )
 
         use_columns = columns is not None
 

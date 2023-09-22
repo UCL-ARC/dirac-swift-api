@@ -100,7 +100,6 @@ def test_create_swift_metadata_dict_failure_serialisation(
 
     mock_json_reproc = mocker.patch(
         "api.processing.metadata.reprocess_json",
-        autospec=True,
     )
 
     mock_json_reproc.side_effect = TypeError("No nice way of serialising things found!")
