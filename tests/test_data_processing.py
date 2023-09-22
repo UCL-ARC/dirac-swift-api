@@ -203,7 +203,7 @@ def test_get_array_spatial_masked_no_columns(
         test_mask_size,
         test_columns,
     )
-    assert masked_array
+    assert masked_array is not None
     assert masked_array.shape == (test_mask_size,)
     assert f"{masked_array[0]:.8e}" == expected_first_element
     assert f"{masked_array[-1]:.8e}" == expected_final_element
@@ -233,7 +233,7 @@ def test_get_array_spatial_masked_columns(
         test_mask_size,
         test_columns,
     )
-    assert masked_array
+    assert masked_array is not None
     assert masked_array.shape == (test_mask_size,)
     assert f"{masked_array[0]:.8f}" == expected_first_element
     assert f"{masked_array[-1]:.8f}" == expected_final_element
