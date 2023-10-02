@@ -4,7 +4,7 @@ from pathlib import Path
 import cloudpickle
 import swiftsimio as sw
 
-from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
+from api.processing.data_processing import SWIFTProcessor
 
 
 def return_mask_boxsize(filename: Path) -> dict[str, str]:
@@ -35,7 +35,6 @@ def return_mask(filename: Path) -> bytes:
     -------
         bytes: Pickled SWIFTMask object.
     """
-    SWIFTProcessor(get_dataset_alias_map())
     mask = sw.mask(str(filename.resolve()))
 
     return cloudpickle.dumps(mask)

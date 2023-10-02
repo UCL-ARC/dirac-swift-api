@@ -4,7 +4,11 @@ from pathlib import Path
 from fastapi import APIRouter, HTTPException, Response, status
 from pydantic import BaseModel
 
-from api.processing.data_processing import SWIFTProcessor, get_dataset_alias_map
+from api.processing.data_processing import (
+    SWIFTProcessor,
+    SWIFTProcessorError,
+    get_dataset_alias_map,
+)
 from api.processing.masks import return_mask, return_mask_boxsize
 from api.processing.metadata import create_swift_metadata
 from api.processing.units import (
@@ -83,7 +87,7 @@ class SWIFTDataSpecException(HTTPException):
 
 
 @router.post("/mask_boxsize")
-async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict[str, str]:
+async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict:
     """Retrieve mask dimensions.
 
     Args:
@@ -128,7 +132,8 @@ async def get_mask(data_spec: SWIFTBaseDataSpec) -> bytes:
     processor = SWIFTProcessor(dataset_map)
     file_path = get_file_path(data_spec, processor)
 
-    return return_mask(file_path)
+    serialised_mask = return_mask(file_path)
+    return Response(content=serialised_mask, media_type="application/octet-stream")
 
 
 def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Path:
@@ -150,7 +155,14 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Pa
     if data_spec.filename:
         file_path = data_spec.filename
     else:
-        file_path = processor.retrieve_filename(data_spec.alias)
+        try:
+            file_path = processor.retrieve_filename(data_spec.alias)
+        except SWIFTProcessorError as error:
+            raise SWIFTDataSpecException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="SWIFT dataset alias not found in dataset map.",
+            ) from error
+
     if file_path is None:
         raise SWIFTDataSpecException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -197,14 +209,20 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict:
             Use the unmasked endpoint if requesting unmasked data.",
         )
 
-    masked_array = processor.get_array_masked(
-        file_path,
-        data_spec.field,
-        data_spec.mask_array_json,
-        data_spec.mask_data_type,
-        data_spec.mask_size,
-        data_spec.columns,
-    )
+    try:
+        masked_array = processor.get_array_masked(
+            file_path,
+            data_spec.field,
+            data_spec.mask_array_json,
+            data_spec.mask_data_type,
+            data_spec.mask_size,
+            data_spec.columns,
+        )
+    except SWIFTProcessorError:
+        raise SWIFTDataSpecException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Field {data_spec.field} not found in the requested file {file_path}.",
+        ) from SWIFTProcessorError
 
     return processor.generate_dict_from_ndarray(
         masked_array,

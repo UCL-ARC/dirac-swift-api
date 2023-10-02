@@ -162,8 +162,8 @@ class SWIFTProcessor:
                     columns=columns,
                 )
             except KeyError:
-                logger.error(f"Could not read {field}")
-                return None
+                message = f"Field {field} not found in {filename}."
+                raise SWIFTProcessorError(message) from KeyError
 
     def get_array_unmasked(
         self,
