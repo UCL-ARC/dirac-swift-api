@@ -1,17 +1,20 @@
 """Module to handle authentiation against the database server."""
 import json
 from pathlib import Path
-
+import jwt
 import requests
 from fastapi import status
 from loguru import logger
 from requests import Session
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class SwiftAuthenticator:
     """Class to handle authentication against the Virgo DB."""
-
     def __init__(
         self,
         username,
@@ -29,6 +32,7 @@ class SwiftAuthenticator:
         self.db_url = db_url
 
         self.cookies_file = cookies_file
+        self.jwt_secret = os.environ.get('JWT_SECRET_KEY')
 
     def validate_credentials(self, session: Session) -> int:
         """Validate user credentials.
@@ -105,3 +109,63 @@ class SwiftAuthenticator:
                 "No previous session cookies found - creating new session cookies",
             )
         return session
+
+    
+    # Peter functions
+
+    def authenticate_with_jwt(self):
+        """Authenticate using JWT and store the token.
+
+        Args:
+            username (str): The username for authentication.
+            password (str): The password for authentication.
+
+        Returns:
+            bool: True if authentication is successful, False otherwise.
+        """
+
+        payload = {'username': self.username, 'password': self.password}
+        response = requests.post("auth server url", json=payload) #auth server to be added
+
+        if response.status_code == status.HTTP_200_OK:
+            json_response = response.json()
+            self.token = json_response.get('token', None)
+            
+            if self.token is None:
+                logger.error("Token missing in authentication response.")
+                return False
+ 
+            return True
+        else:
+            logger.error("Authentication failed.")
+            return False
+
+    def verify_jwt_token(self):
+        """Verify the stored JWT token.
+
+        Returns:
+            bool: True if the token is valid, False otherwise.
+        """
+        try:
+            jwt.decode(self.token, self.jwt_secret, algorithms=["HS256"])
+            return True
+        except jwt.ExpiredSignatureError:
+            logger.error("JWT token has expired")
+            return False
+        except jwt.InvalidTokenError:
+            logger.error("Invalid JWT token")
+            return False
+
+    def authenticated_request(self):
+        """Make an authenticated request using the JWT token..
+
+        Returns:
+            requests.Response: The response object.
+        """
+        if not self.token or not self.verify_jwt_token():
+            logger.error("No valid token available.")
+            return None
+
+        headers = {"Authorization": f"Bearer {self.token}"}
+        response = requests.get("url for get requests", headers=headers) #add request from fastapi to pull headers from URL
+        return response
