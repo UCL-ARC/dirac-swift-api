@@ -2,31 +2,29 @@
 """Module to define the main settings class for the API."""
 
 from loguru import logger
-from pydantic import Field, SecretStr, ValidationError
+from pydantic import ValidationError
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     """Class to store typed settings via Pydantic."""
 
-    username: str = Field(..., min_length=1)
-    password: SecretStr = Field(..., min_length=1)
     db_url: str = "http://virgodb.dur.ac.uk:8080/Eagle/"
 
     model_config = SettingsConfigDict(
-        env_prefix="virgo_",
         env_file=".env",
         env_file_encoding="utf-8",
     )
 
 
 def get_settings(*args, **kwargs) -> Settings:
-    """Allows lazy loading of Settings.
+    """Enable lazy loading of Settings.
 
     Enables testing without environment variables.
 
 
-    Returns:
+    Returns
+    -------
         Settings: Settings object containing VirgoDB
             username, password and DB url. If settings fails to load,
             returns a Settings object showing missing fields.
@@ -44,8 +42,6 @@ def get_settings(*args, **kwargs) -> Settings:
             errors_msg.update(error_msg)
 
         error_settings = Settings(
-            username="error",
-            password="error",  # noqa: S106
             db_url="error",
         )
 

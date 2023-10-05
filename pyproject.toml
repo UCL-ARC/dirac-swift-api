@@ -19,6 +19,7 @@ classifiers = [
 ]
 dependencies = [
     "aiofiles>=23.1.0",
+    "cloudpickle==2.2.1",
     "fastapi>=0.100.0",
     "httpx>=0.24.1",
     "loguru>=0.7.0",
@@ -27,6 +28,7 @@ dependencies = [
     "pydantic~=2.1",
     "python-dotenv>=1.0.0",
     "requests>=2.31.0",
+    "swiftsimio~=7.0.1",
     "uvicorn>=0.22.0",
 ]
 description = "Repository for the REST API side of the DiRAC-SWIFT project "
@@ -95,7 +97,11 @@ ignore = [
     "D203", # no-blank-line-before-class
     "D212", # multi-line-summary-first-line
     "D417", # argument description in docstring (unreliable),
+    "PGH003", # Use specific rule codes when ignoring type issues
+    "PLR0911", # Too many return statements (10 > 6)
+    "PLR0913", # Too many arguments to function call
 ]
+line-length = 100
 per-file-ignores = {"test_*" = [
     "S101",
 ], "tests/*" = [
@@ -155,7 +161,7 @@ pep8-naming.classmethod-decorators = [
 ]
 
 [tool.ruff.pydocstyle]
-convention = "google"
+convention = "numpy"
 
 [tool.tomlsort]
 all = true
