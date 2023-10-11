@@ -149,7 +149,7 @@ select = [
     "W",
     "YTT",
 ]
-target-version = "py311"
+target-version = "py310"
 isort.known-first-party = [
     "dirac_swift_api",
 ]
@@ -185,5 +185,5 @@ legacy_tox_ini = """
 
     [tox]
     env_list =
-        py311
+        py310
 """
