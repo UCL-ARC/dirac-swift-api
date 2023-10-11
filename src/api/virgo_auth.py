@@ -10,6 +10,7 @@ from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 import os
 from dotenv import load_dotenv
 import datetime
+from pydantic import BaseModel
 
 load_dotenv()
 
@@ -176,3 +177,6 @@ class SwiftAuthenticator:
         response = requests.get("url for get requests", headers=headers) #add request from fastapi to pull headers from URL
         return response
 
+class AuthRequest(BaseModel):
+    username: str
+    password: str
