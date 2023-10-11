@@ -9,6 +9,7 @@ from requests import Session
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 
@@ -113,6 +114,11 @@ class SwiftAuthenticator:
     
     # Peter functions
 
+    def generate_token(self):
+        expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+        token = jwt.encode({"exp": expiration, "username": self.username}, self.jwt_secret, algorithm="HS256")
+        return token
+
     def authenticate_with_jwt(self):
         """Authenticate using JWT and store the token.
 
@@ -169,3 +175,4 @@ class SwiftAuthenticator:
         headers = {"Authorization": f"Bearer {self.token}"}
         response = requests.get("url for get requests", headers=headers) #add request from fastapi to pull headers from URL
         return response
+
