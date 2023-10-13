@@ -1,4 +1,4 @@
-import dotenv
+import os
 
 pytest_plugins = [
     "tests.fixtures.test_http_requests",
@@ -6,6 +6,5 @@ pytest_plugins = [
     "tests.fixtures.test_data",
 ]
 
-
-def pytest_configure():
-    dotenv.load_dotenv("tests/data/.env.test")
+os.environ["DB_URL"] = "http://a/test/url"
+os.environ["JWT_SECRET_KEY"] = "a_test_secret_key"  # noqa: S105

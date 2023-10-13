@@ -17,9 +17,9 @@ def mock_successful_response(mocker):
 
 @pytest.fixture()
 def mock_settings():
-    test_url = "test_url"
     return Settings(
-        db_url=test_url,
+        db_url="http://a/test/url",
+        jwt_secret_key="a_test_key",  # noqa: S106
     )
 
 
