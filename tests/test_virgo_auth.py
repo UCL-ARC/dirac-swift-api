@@ -21,7 +21,7 @@ def test_authenticate_success(mock_settings, mocker):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
     )
 
     result = auth.authenticate()
@@ -45,7 +45,7 @@ def test_authenticate_failure_auth(mock_settings, mocker):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
     )
 
     result = auth.authenticate()
@@ -69,7 +69,7 @@ def test_authenticate_failure_bad_url(mock_settings, mocker):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
     )
 
     result = auth.authenticate()
@@ -89,7 +89,7 @@ def test_save_cookies_success(temp_out_dir, mock_settings):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
         cookies_file=test_cookies,
     )
 
@@ -109,7 +109,7 @@ def test_save_cookies_failure(temp_out_dir, mock_settings):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
         cookies_file=test_cookies,
     )
     auth.save_cookies(test_session)
@@ -128,7 +128,7 @@ def test_load_cookies(mock_settings, data_path):
     auth = SwiftAuthenticator(
         test_user,
         test_pass,
-        mock_settings.db_url,
+        mock_settings,
         cookies_file=test_cookies,
     )
 

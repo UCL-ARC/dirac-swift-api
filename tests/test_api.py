@@ -24,68 +24,104 @@ def test_ping():
     assert response.json() == {"ping": "pong"}
 
 
-def test_get_mask_boxsize_success(template_swift_data_path):
+def test_get_mask_boxsize_success(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
     expected_array = [142.2475106685633, 142.2475106685633, 142.2475106685633]
-    response = client.post("/mask_boxsize", json=payload)
+
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/mask_boxsize",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_200_OK
     assert response.json()["array"] == expected_array
 
 
-def test_get_mask_boxsize_failure():
+def test_get_mask_boxsize_failure(mock_auth_client_success_jwt_decode):
     payload = {
-        "filename": "/an/incorrect/file/path",
+        "data_spec": {
+            "filename": "/an/incorrect/file/path",
+        },
     }
-    response = client.post("/mask_boxsize", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/mask_boxsize",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
 
-def test_get_filepath_from_alias_fails_if_not_str(template_swift_data_path):
+def test_get_filepath_from_alias_fails_if_not_str(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": template_swift_data_path,
+        "data_spec": {
+            "filename": template_swift_data_path,
+        },
     }
 
     with pytest.raises(TypeError) as error:
-        client.post("/filepath", json=payload)
+        mock_auth_client_success_jwt_decode.post("/swiftdata/filepath", json=payload)
 
     assert "not JSON serializable" in str(error.value)
 
 
-def test_get_filepath_from_alias_success(template_swift_data_path):
+def test_get_filepath_from_alias_success(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
 
-    response = client.post("/filepath", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/filepath",
+        json=payload,
+    )
 
     assert response.status_code == status.HTTP_200_OK
 
     assert response.json() == str(template_swift_data_path)
 
 
-def test_get_filepath_from_alias_failure_no_alias_found():
+def test_get_filepath_from_alias_failure_no_alias_found(
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "alias": "An imaginary dataset",
+        "data_spec": {
+            "alias": "An imaginary dataset",
+        },
     }
     expected_error_message = "SWIFT dataset alias not found in dataset map."
 
-    response = client.post("/filepath", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/filepath",
+        json=payload,
+    )
 
     assert response.status_code == status.HTTP_400_BAD_REQUEST
 
     assert response.json()["detail"] == expected_error_message
 
 
-def test_get_mask(template_swift_data_path):
+def test_get_mask(template_swift_data_path, mock_auth_client_success_jwt_decode):
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
 
     expected_mask_cell_size = unyt_array([17.78093883, 17.78093883, 17.78093883], "Mpc")
 
-    response = client.post("/mask", json=payload)
+    response = mock_auth_client_success_jwt_decode.post("/swiftdata/mask", json=payload)
 
     assert response.status_code == status.HTTP_200_OK
 
@@ -168,119 +204,190 @@ def test_get_file_path_failure_bad_filename_provided():
 
 def test_get_masked_array_data_fails_missing_all_required_info(
     template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
 ):
     # Test if required info beyond the basic spec is missing
 
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
 
     expected_missing_fields = 3
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     # Three compulsory non-filename fields
     assert len(response.json()["detail"]) == expected_missing_fields
 
 
-def test_get_masked_array_data_fails_missing_field(template_swift_data_path):
+def test_get_masked_array_data_fails_missing_field(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "mask_array_json": "[[337.0], [234.1, 233.1], [355.1]]",
-        "mask_size": 3,
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "mask_array_json": "[[337.0], [234.1, 233.1], [355.1]]",
+            "mask_size": 3,
+        },
     }
 
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     assert len(response.json()["detail"]) == 1
     assert response.json()["detail"][0]["loc"][-1] == "field"
 
 
-def test_get_masked_array_data_fails_missing_mask_array(template_swift_data_path):
+def test_get_masked_array_data_fails_missing_mask_array(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "gas",
-        "mask_size": 3,
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "gas",
+            "mask_size": 3,
+        },
     }
 
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     assert len(response.json()["detail"]) == 1
     assert response.json()["detail"][0]["loc"][-1] == "mask_array_json"
 
 
-def test_get_masked_array_data_fails_missing_mask_size(template_swift_data_path):
+def test_get_masked_array_data_fails_missing_mask_size(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "gas",
-        "mask_array_json": "[[337.0], [234.1, 233.1], [355.1]]",
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "gas",
+            "mask_array_json": "[[337.0], [234.1, 233.1], [355.1]]",
+        },
     }
 
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
     assert len(response.json()["detail"]) == 1
     assert response.json()["detail"][0]["loc"][-1] == "mask_size"
 
 
-def test_get_masked_array_data_fails_with_invalid_field_name(template_swift_data_path):
+def test_get_masked_array_data_fails_with_invalid_field_name(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "a_made_up/field",
-        "mask_array_json": "[[337.0], [234.1], [355.1]]",
-        "mask_size": 3,
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "a_made_up/field",
+            "mask_array_json": "[[337.0], [234.1], [355.1]]",
+            "mask_size": 3,
+        },
     }
 
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_400_BAD_REQUEST
-    assert f"{payload['field']} not found" in response.json()["detail"]
+    field = payload["data_spec"]["field"]
+    assert f"{field} not found" in response.json()["detail"]
 
 
-def test_get_masked_array_data_spatial_success(template_swift_data_path):
+def test_get_masked_array_data_spatial_success(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "PartType0/Coordinates",
-        "mask_array_json": "[[0, 334]]",
-        "mask_size": 334,
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "PartType0/Coordinates",
+            "mask_array_json": "[[0, 334]]",
+            "mask_size": 334,
+        },
     }
 
-    response = client.post("/masked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/masked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_200_OK
     assert isinstance(response.json()["array"], list)
-    assert len(response.json()["array"]) == payload["mask_size"]
+    assert len(response.json()["array"]) == payload["data_spec"]["mask_size"]
 
 
-def test_get_unmasked_array_data_success_no_columns(template_swift_data_path):
+def test_get_unmasked_array_data_success_no_columns(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "PartType0/Coordinates",
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "PartType0/Coordinates",
+        },
     }
     expected_array_length = 261992
-    response = client.post("/unmasked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/unmasked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["array"]) == expected_array_length
 
 
-def test_get_unmasked_array_data_success_columns(template_swift_data_path):
+def test_get_unmasked_array_data_success_columns(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
-        "field": "PartType0/Coordinates",
-        "columns": 0,
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+            "field": "PartType0/Coordinates",
+            "columns": 0,
+        },
     }
     expected_array_length = 261992
-    response = client.post("/unmasked_dataset", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/unmasked_dataset",
+        json=payload,
+    )
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["array"]) == expected_array_length
 
 
-def test_retrieve_metadata(template_swift_data_path):
+def test_retrieve_metadata(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
 
-    response = client.post("/swiftmetadata", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/metadata",
+        json=payload,
+    )
 
     assert response.status_code == status.HTTP_200_OK
     retrieved_metadata_object = cloudpickle.loads(response.content)
@@ -288,13 +395,18 @@ def test_retrieve_metadata(template_swift_data_path):
     assert isinstance(retrieved_metadata_object, SWIFTMetadata)
 
 
-def test_retrieve_units(template_swift_data_path):
+def test_retrieve_units(template_swift_data_path, mock_auth_client_success_jwt_decode):
     payload = {
-        "filename": str(template_swift_data_path),
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
     }
 
     expected_time = "977.79 Gyr"
-    response = client.post("/swiftunits", json=payload)
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/units_dict",
+        json=payload,
+    )
 
     assert response.status_code == status.HTTP_200_OK
 
