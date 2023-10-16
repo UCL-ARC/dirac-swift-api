@@ -50,6 +50,7 @@ optional-dependencies = {dev = [
     "types-requests",
     "types-urllib3",
 ], test = [
+    "freezegun",
     "pytest",
     "pytest-cov",
     "pytest-mock",
