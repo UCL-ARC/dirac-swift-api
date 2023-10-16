@@ -5,6 +5,9 @@ from api.virgo_auth import SwiftAuthenticator
 from fastapi import status
 from requests import Session
 from requests.exceptions import RequestException
+import jwt
+import datetime
+
 
 
 def test_authenticate_success(mock_settings, mocker):
@@ -138,3 +141,81 @@ def test_load_cookies(mock_settings, data_path):
     assert len(cookies_dict.keys()) == 1
     assert "SESSIONID" in cookies_dict
     assert cookies_dict["SESSIONID"] == "TESTSESSION"
+
+
+def test_generate_token(mock_settings, mocker):
+    mocker.patch.dict('os.environ', {'JWT_SECRET_KEY': 'mysecret'})
+
+    mock_datetime = mocker.patch('datetime.datetime')
+    mock_datetime.utcnow.return_value = datetime.datetime(2022, 1, 1)
+
+    test_user = "test_user"
+    test_pass = "test_pass"  # noqa: S105
+    auth = SwiftAuthenticator(
+        test_user,
+        test_pass,
+        mock_settings,
+    )
+
+    generated_token = auth.generate_token()
+
+
+    decoded = jwt.decode(generated_token, 'mysecret', algorithms=['HS256'])
+    expected_exp = datetime.datetime(2022, 1, 1, 1, 0)  # 1 hour added to utcnow
+    expected_exp_unix = expected_exp.timestamp()
+
+    assert decoded['exp'] == expected_exp_unix
+    assert decoded['username'] == "test_user"
+
+
+def test_verify_jwt_token_valid(mock_settings, mocker):
+    mocker.patch.dict('os.environ', {'JWT_SECRET_KEY': 'mysecret'})
+
+    test_user = "test_user"
+    test_pass = "test_pass"  # noqa: S105
+    auth = SwiftAuthenticator(
+        test_user,
+        test_pass,
+        mock_settings,
+    )
+
+
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    valid_token = jwt.encode({"exp": expiration, "username": "test_user"}, 'mysecret', algorithm='HS256')
+    auth.token = valid_token
+
+    assert auth.verify_jwt_token() is True
+
+def test_verify_jwt_token_expired(mock_settings, mocker):
+    mocker.patch.dict('os.environ', {'JWT_SECRET_KEY': 'mysecret'})
+
+    test_user = "test_user"
+    test_pass = "test_pass"  # noqa: S105
+    auth = SwiftAuthenticator(
+        test_user,
+        test_pass,
+        mock_settings,
+    )
+
+    expiration = datetime.datetime.utcnow() - datetime.timedelta(hours=1)
+    expired_token = jwt.encode({"exp": expiration, "username": "test_user"}, 'mysecret', algorithm='HS256')
+    auth.token = expired_token
+
+    assert auth.verify_jwt_token() is False
+
+def test_verify_jwt_token_invalid(mock_settings, mocker):
+    mocker.patch.dict('os.environ', {'JWT_SECRET_KEY': 'mysecret'})
+
+    test_user = "test_user"
+    test_pass = "test_pass"  # noqa: S105
+    auth = SwiftAuthenticator(
+        test_user,
+        test_pass,
+        mock_settings,
+    )
+
+    expiration = datetime.datetime.utcnow() + datetime.timedelta(hours=1)
+    invalid_token = jwt.encode({"exp": expiration, "username": "test_user"}, 'wrongsecret', algorithm='HS256')
+    auth.token = invalid_token
+
+    assert auth.verify_jwt_token() is False
