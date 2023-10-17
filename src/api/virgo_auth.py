@@ -1,12 +1,36 @@
 """Module to handle authentiation against the database server."""
 import json
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import jwt
 import requests
-from fastapi import status
+from fastapi import HTTPException, status
 from loguru import logger
 from requests import Session
 from requests.utils import cookiejar_from_dict, dict_from_cookiejar
+
+from api.config import Settings
+
+
+class SWIFTAuthenticatorException(HTTPException):
+    """Custom exception for Virgo DB authentication errors.
+
+    Args:
+        HTTPException (_type_): HTTPException with status code.
+    """
+
+    def __init__(self, status_code: int, detail: str | None = None):
+        """Class constructor.
+
+        Args:
+            status_code (int): HTTP response status code
+            detail (str | None, optional):
+                Additional exception details. Defaults to None.
+        """
+        if not detail:
+            detail = "Error authenticating current user."
+        super().__init__(status_code, detail=detail)
 
 
 class SwiftAuthenticator:
@@ -14,9 +38,9 @@ class SwiftAuthenticator:
 
     def __init__(
         self,
-        username,
-        password,
-        db_url,
+        username: str,
+        password: str,
+        settings: Settings,
         cookies_file: Path = Path(__file__).parent.resolve() / "cookie_jar.txt",
     ):
         """Class constructor for authenticator object.
@@ -26,9 +50,10 @@ class SwiftAuthenticator:
         """
         self.username = username
         self.password = password
-        self.db_url = db_url
+        self.db_url = settings.db_url
 
         self.cookies_file = cookies_file
+        self.jwt_secret = settings.jwt_secret_key.get_secret_value()
 
     def validate_credentials(self, session: Session) -> int:
         """Validate user credentials.
@@ -105,3 +130,38 @@ class SwiftAuthenticator:
                 "No previous session cookies found - creating new session cookies",
             )
         return session
+
+    def generate_token(self) -> str:
+        """Generate a JWT token.
+
+        Returns
+        -------
+            token (str): Generated JWT token.
+        """
+        expiration = datetime.now(UTC) + timedelta(hours=1)
+        return jwt.encode(
+            {"exp": expiration, "sub": self.username},
+            self.jwt_secret,
+            algorithm="HS256",
+        )
+
+    def authenticate_and_generate_jwt(self) -> str:
+        """Authenticate using JWT and store the token.
+
+        Raises
+        ------
+            SWIFTAuthenticatorException: _description_
+
+        Returns
+        -------
+            str: Generated JWT token
+        """
+        auth_status = self.authenticate()
+
+        if auth_status == status.HTTP_200_OK:
+            return self.generate_token()
+
+        raise SWIFTAuthenticatorException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authentication status was not HTTP 200!",
+        )
