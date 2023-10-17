@@ -1,7 +1,7 @@
 """Defines routes that return numpy arrays from HDF5 files."""
 from pathlib import Path
 
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel
 
 from api.processing.data_processing import (
@@ -16,8 +16,11 @@ from api.processing.units import (
     retrieve_swiftunits_dict,
     retrieve_units_json_compatible,
 )
+from api.routers.auth import get_authenticated_user
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/swiftdata",
+)
 
 dataset_map = get_dataset_alias_map()
 
@@ -87,7 +90,10 @@ class SWIFTDataSpecException(HTTPException):
 
 
 @router.post("/mask_boxsize")
-async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict:
+async def get_mask_boxsize(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> dict:
     """Retrieve mask dimensions.
 
     Args:
@@ -104,7 +110,10 @@ async def get_mask_boxsize(data_spec: SWIFTBaseDataSpec) -> dict:
 
 
 @router.post("/filepath")
-async def get_filepath_from_alias(data_spec: SWIFTBaseDataSpec) -> Path:
+async def get_filepath_from_alias(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> Path:
     """Retrieve full file path.
 
     Args:
@@ -119,7 +128,10 @@ async def get_filepath_from_alias(data_spec: SWIFTBaseDataSpec) -> Path:
 
 
 @router.post("/mask")
-async def get_mask(data_spec: SWIFTBaseDataSpec) -> bytes:
+async def get_mask(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> bytes:
     """Retrieve SWIFTMask object.
 
     Args:
@@ -177,7 +189,10 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Pa
 
 
 @router.post("/masked_dataset")
-async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict:
+async def get_masked_array_data(
+    data_spec: SWIFTMaskedDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> dict:
     """Retrieve a masked array from a dataset.
 
     Applies masking to an array generated from the HDF5 file
@@ -230,7 +245,10 @@ async def get_masked_array_data(data_spec: SWIFTMaskedDataSpec) -> dict:
 
 
 @router.post("/unmasked_dataset")
-async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict:
+async def get_unmasked_array_data(
+    data_spec: SWIFTUnmaskedDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> dict:
     """Retrieve an unmasked array from a dataset.
 
     Returns the array generated from the HDF5 file
@@ -266,8 +284,11 @@ async def get_unmasked_array_data(data_spec: SWIFTUnmaskedDataSpec) -> dict:
     )
 
 
-@router.post("/swiftmetadata")
-async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
+@router.post("/metadata")
+async def retrieve_metadata(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> Response:
     """Retrieve metadata from a file path.
 
     Args:
@@ -288,8 +309,11 @@ async def retrieve_metadata(data_spec: SWIFTBaseDataSpec) -> dict:
     return Response(content=serialised_metadata, media_type="application/octet-stream")
 
 
-@router.post("/swiftunits")
-async def retrieve_units(data_spec: SWIFTBaseDataSpec) -> dict:
+@router.post("/units_dict")
+async def retrieve_units(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> dict:
     """Retrieve units for the specified file.
 
     Args:
