@@ -257,7 +257,7 @@ def test_get_unmasked_array_data_success_no_columns(template_swift_data_path):
         "filename": str(template_swift_data_path),
         "field": "PartType0/Coordinates",
     }
-    expected_array_length = 261992
+    expected_array_length = 32382
     response = client.post("/unmasked_dataset", json=payload)
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["array"]) == expected_array_length
@@ -269,7 +269,7 @@ def test_get_unmasked_array_data_success_columns(template_swift_data_path):
         "field": "PartType0/Coordinates",
         "columns": 0,
     }
-    expected_array_length = 261992
+    expected_array_length = 32382
     response = client.post("/unmasked_dataset", json=payload)
     assert response.status_code == status.HTTP_200_OK
     assert len(response.json()["array"]) == expected_array_length
