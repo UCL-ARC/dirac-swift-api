@@ -177,11 +177,9 @@ def test_verify_jwt_token_valid(mock_settings):
         algorithm="HS256",
     )
 
-    expected_user = test_user
-
     decoded_token = decode_jwt(token, mock_settings)
 
-    assert decoded_token == expected_user
+    assert decoded_token == test_user
 
 
 def test_verify_jwt_token_expired(mock_settings):
