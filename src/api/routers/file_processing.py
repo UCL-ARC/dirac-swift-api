@@ -92,7 +92,7 @@ class SWIFTDataSpecException(HTTPException):
 @router.post("/mask_boxsize")
 async def get_mask_boxsize(
     data_spec: SWIFTBaseDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> dict:
     """Retrieve mask dimensions.
 
@@ -112,7 +112,7 @@ async def get_mask_boxsize(
 @router.post("/filepath")
 async def get_filepath_from_alias(
     data_spec: SWIFTBaseDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> Path:
     """Retrieve full file path.
 
@@ -130,7 +130,7 @@ async def get_filepath_from_alias(
 @router.post("/mask")
 async def get_mask(
     data_spec: SWIFTBaseDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> bytes:
     """Retrieve SWIFTMask object.
 
@@ -191,7 +191,7 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Pa
 @router.post("/masked_dataset")
 async def get_masked_array_data(
     data_spec: SWIFTMaskedDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> dict:
     """Retrieve a masked array from a dataset.
 
@@ -247,7 +247,7 @@ async def get_masked_array_data(
 @router.post("/unmasked_dataset")
 async def get_unmasked_array_data(
     data_spec: SWIFTUnmaskedDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> dict:
     """Retrieve an unmasked array from a dataset.
 
@@ -287,7 +287,7 @@ async def get_unmasked_array_data(
 @router.post("/metadata")
 async def retrieve_metadata(
     data_spec: SWIFTBaseDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> Response:
     """Retrieve metadata from a file path.
 
@@ -312,7 +312,7 @@ async def retrieve_metadata(
 @router.post("/units_dict")
 async def retrieve_units(
     data_spec: SWIFTBaseDataSpec,
-    _: dict = Depends(get_authenticated_user),
+    _: str = Depends(get_authenticated_user),
 ) -> dict:
     """Retrieve units for the specified file.
 
