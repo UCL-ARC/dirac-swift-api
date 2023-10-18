@@ -1,6 +1,6 @@
 """Module to handle authentiation against the database server."""
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import jwt
@@ -138,7 +138,7 @@ class SwiftAuthenticator:
         -------
             token (str): Generated JWT token.
         """
-        expiration = datetime.now(UTC) + timedelta(hours=1)
+        expiration = datetime.now(timezone.utc) + timedelta(hours=1)
         return jwt.encode(
             {"exp": expiration, "sub": self.username},
             self.jwt_secret,
