@@ -92,18 +92,19 @@ gunicorn src.api.main:app --workers ${n_workers} --worker-class uvicorn.workers.
 
 ### Running Tests
 
-Tests can be run either via `tox` or directly via `pytest`
+Tests can be run either via `tox` or directly via `pytest` from the top level directory of the repository
 
 ```bash
-cd api
 tox run
 ```
 
 or
 
 ```bash
-python -m pytest -ra . --cov=api/src/api
+python -m pytest -ra . --cov=src/api
 ```
+
+either of which will run all tests and generate a coverage report.
 
 ## Contributing
 

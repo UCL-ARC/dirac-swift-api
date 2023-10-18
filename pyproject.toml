@@ -181,8 +181,9 @@ legacy_tox_ini = """
 
     [testenv]
     commands =
-        pytest -ra tests --cov=src/api
+        pytest -ra . --cov=api
     deps =
+        freezegun
         pytest
         pytest-cov
         pytest-mock
