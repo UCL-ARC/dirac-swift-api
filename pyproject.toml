@@ -14,20 +14,21 @@ classifiers = [
     "Operating System :: POSIX",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.10",
     "Typing :: Typed",
 ]
 dependencies = [
     "aiofiles>=23.1.0",
     "cloudpickle==2.2.1",
-    "fastapi>=0.100.0",
+    "fastapi>=0.103.0,<0.104.0",
+    "gunicorn>=21.2.0",
     "httpx>=0.24.1",
     "loguru>=0.7.0",
-    "psycopg2==2.9.6",
     "pydantic-settings~=2.0.2",
     "pydantic~=2.1",
     "pyjwt>=2.8.0",
     "python-dotenv>=1.0.0",
+    "python-multipart>=0.0.6",
     "requests>=2.31.0",
     "swiftsimio~=7.0.1",
     "uvicorn>=0.22.0",
@@ -39,11 +40,11 @@ name = "dirac-swift-api"
 optional-dependencies = {dev = [
     "black",
     "build",
-    "mypy==1.4.1",
+    "mypy",
     "pre-commit",
+    "pytest",
     "pytest-cov",
     "pytest-mock",
-    "pytest==7.4.0",
     "ruff",
     "tox",
     "twine",
@@ -57,8 +58,8 @@ optional-dependencies = {dev = [
     "tox",
 ]}
 readme = "README.md"
-requires-python = ">=3.11"
-version = "0.0.1"
+requires-python = ">=3.10"
+version = "1.0.1"
 license.file = "LICENCE.md"
 urls.homepage = "https://github.com/UCL-ARC/dirac-swift-api"
 
@@ -152,7 +153,7 @@ select = [
     "W",
     "YTT",
 ]
-target-version = "py311"
+target-version = "py310"
 isort.known-first-party = [
     "dirac_swift_api",
 ]
@@ -176,17 +177,18 @@ overrides."tool.coverage.paths.source".inline_arrays = false
 legacy_tox_ini = """
     [gh-actions]
     python =
-        3.11: py311
+        3.10: py310
 
     [testenv]
     commands =
-        pytest -ra tests --cov=src/api
+        pytest -ra . --cov=api
     deps =
+        freezegun
         pytest
         pytest-cov
         pytest-mock
 
     [tox]
     env_list =
-        py311
+        py310
 """

@@ -1,5 +1,5 @@
 import json
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import jwt
@@ -159,7 +159,14 @@ def test_generate_token(mock_settings):
     generated_token = auth.generate_token()
 
     decoded = jwt.decode(generated_token, expected_test_secret, algorithms=["HS256"])
-    expected_exp = datetime(2022, 1, 1, 1, 0, tzinfo=UTC)  # 1 hour added to utcnow
+    expected_exp = datetime(
+        2022,
+        1,
+        1,
+        1,
+        0,
+        tzinfo=timezone.utc,
+    )  # 1 hour added to utcnow
     expected_exp_unix = expected_exp.timestamp()
 
     assert decoded["exp"] == expected_exp_unix
@@ -170,7 +177,7 @@ def test_verify_jwt_token_valid(mock_settings):
     expected_test_secret = mock_settings.jwt_secret_key.get_secret_value()
     test_user = "test_user"
 
-    expiration = datetime.now(UTC) + timedelta(hours=1)
+    expiration = datetime.now(timezone.utc) + timedelta(hours=1)
     token = jwt.encode(
         {"exp": expiration, "sub": test_user},
         expected_test_secret,
@@ -185,7 +192,7 @@ def test_verify_jwt_token_valid(mock_settings):
 def test_verify_jwt_token_expired(mock_settings):
     test_user = "test_user"
     expected_test_secret = mock_settings.jwt_secret_key.get_secret_value()
-    expiration = datetime.now(UTC) - timedelta(hours=1)
+    expiration = datetime.now(timezone.utc) - timedelta(hours=1)
     expired_token = jwt.encode(
         {"exp": expiration, "sub": test_user},
         expected_test_secret,
@@ -200,7 +207,7 @@ def test_verify_jwt_token_expired(mock_settings):
 
 def test_verify_jwt_token_invalid(mock_settings):
     test_user = "test_user"
-    expiration = datetime.now(UTC) + timedelta(hours=1)
+    expiration = datetime.now(timezone.utc) + timedelta(hours=1)
     invalid_token = jwt.encode(
         {"exp": expiration, "sub": test_user},
         "wrongsecret",

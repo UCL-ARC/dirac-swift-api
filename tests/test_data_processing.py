@@ -13,10 +13,13 @@ def test_retrieve_filename_failure(template_dataset_alias_map):
         processor.retrieve_filename("a_nonexistant_alias")
 
 
-def test_retrieve_filename_success(template_dataset_alias_map):
+def test_retrieve_filename_success(
+    template_dataset_alias_map,
+    template_swift_data_path,
+):
     processor = SWIFTProcessor(template_dataset_alias_map)
 
-    expected_filename = "cosmo_volume_example.hdf5"
+    expected_filename = str(template_swift_data_path).rsplit("/", 1)[-1]
     filename = processor.retrieve_filename("test_file")
 
     assert Path(filename).name == expected_filename  # type: ignore
@@ -113,9 +116,9 @@ def test_get_array_unmasked_no_columns(
     test_columns = None
     processor = SWIFTProcessor(template_dataset_alias_map)
 
-    expected_shape = (261992,)
+    expected_shape = (32382,)
     expected_first_element_6dp = "6.377697e-06"
-    expected_final_element_6dp = "1.192093e-06"
+    expected_20k_element_6dp = "8.940697e-07"
 
     output = processor.get_array_unmasked(
         template_swift_data_path,
@@ -125,7 +128,7 @@ def test_get_array_unmasked_no_columns(
 
     assert output.shape == expected_shape
     assert f"{output[0]:.6e}" == expected_first_element_6dp
-    assert f"{output[-1]:.6e}" == expected_final_element_6dp
+    assert f"{output[20000]:.6e}" == expected_20k_element_6dp
 
 
 def test_get_array_unmasked_columns(
@@ -136,11 +139,11 @@ def test_get_array_unmasked_columns(
     test_columns = 0
     processor = SWIFTProcessor(template_dataset_alias_map)
 
-    expected_shape = (261992,)
+    expected_shape = (32382,)
     expected_first_element_col0 = "0.75200003"
-    expected_final_element_col0 = "0.75200033"
+    expected_final_element_col0 = "0.75199997"
     expected_first_element_col1 = "0.24800000"
-    expected_final_element_col1 = "0.24800017"
+    expected_final_element_col1 = "0.24800000"
 
     output = processor.get_array_unmasked(
         template_swift_data_path,

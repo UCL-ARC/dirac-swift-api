@@ -345,7 +345,7 @@ def test_get_unmasked_array_data_success_no_columns(
             "field": "PartType0/Coordinates",
         },
     }
-    expected_array_length = 261992
+    expected_array_length = 32382
     response = mock_auth_client_success_jwt_decode.post(
         "/swiftdata/unmasked_dataset",
         json=payload,
@@ -365,7 +365,7 @@ def test_get_unmasked_array_data_success_columns(
             "columns": 0,
         },
     }
-    expected_array_length = 261992
+    expected_array_length = 32382
     response = mock_auth_client_success_jwt_decode.post(
         "/swiftdata/unmasked_dataset",
         json=payload,

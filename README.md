@@ -37,7 +37,7 @@ Centre for Advanced Research Computing, University College London
 
 ### Prerequisites
 
-- Python 3.11
+- Python 3.10 or newer
 
 ### Installation
 
@@ -58,10 +58,12 @@ source ./env/bin/activate
 - While in the top-level repository directory (containing this `README.md`)
 
 ```bash
-pip install "./api[dev]"
+pip install "./api[dev,test]"
 ```
 
-### Running Locally
+## Running the API
+
+### Running locally
 
 After installing the package, from the root directory (containing this README)
 
@@ -71,41 +73,38 @@ uvicorn api.main:app --reload
 
 By default, the API will be served on `localhost:8000`, with OpenAPI documentation available at `localhost:8000/docs`
 
-### Running via Docker Compose
+### Deploying the API
 
-Create a `.env` file in the package root directory, based on the `.env.example`provided and noting the following
+When deploying the API for use in production, it's recommended to use [Gunicorn](https://docs.gunicorn.org/en/stable/index.html) to serve the FastAPI application and act as a process manager. Gunicorn can start one or more uvicorn worker processes, listening on the port indicated on startup. Request and response handling is taken care of by individual workers.
 
-- Provide an `API_UID` in the file matching the integer returned by `id -u`
-- Supply a port to `API_PORT` that you will use to access the API
+Gunicorn will restart failing workers, but care should be taken to deal with cases where the Gunicorn process itself is killed.
+It's important to note that Gunicorn does not provide load balancing capability, but relies on the operating system to perform that role.
 
-From the package root directory, bring the API up with
+The documentation recommends `(2 x $num_cores) + 1` workers, although depending on your deployment environment this may not be suitable.
 
-```bash
-docker compose -p swiftapi up --build
-```
-
-where `-p swiftapi` sets the docker compose project name to `swiftapi`.
-
-Bring the running container down with
+As an example, to start this application under Gunicorn on a `localhost` port with your choice of workers:
 
 ```bash
-docker compose down
+gunicorn src.api.main:app --workers ${n_workers} --worker-class uvicorn.workers.UvicornWorker --bind localhost:${port}
 ```
+
+## For developers
 
 ### Running Tests
 
-Tests can be run either via `tox` or directly via `pytest`
+Tests can be run either via `tox` or directly via `pytest` from the top level directory of the repository
 
 ```bash
-cd api
 tox run
 ```
 
 or
 
 ```bash
-python -m pytest -ra . --cov=api/src/api
+python -m pytest -ra . --cov=src/api
 ```
+
+either of which will run all tests and generate a coverage report.
 
 ## Contributing
 
@@ -115,7 +114,7 @@ To contribute to the project as a developer, use the following as a guide. These
 
 To make explicit some of the potentially implicit:
 
-- We will target Python versions `>= 3.11`
+- We will target Python versions `>= 3.10`
 - We will use [ruff](https://beta.ruff.rs/docs/) for linting and [black](https://github.com/psf/black) for code formatting to standardise code, improve legibility and speed up code reviews
 - Function arguments and return types will be annotated, with type checking via [mypy](https://mypy.readthedocs.io/en/stable/)
 - We will use [docstrings](https://peps.python.org/pep-0257/) to annotate classes, class methods and functions
@@ -147,7 +146,7 @@ The `main` branch is for ready-to-deploy release quality code
 
 ## Project Roadmap
 
-- [x] Initial Research <-- You are Here
-- [ ] Minimum viable product
+- [x] Initial Research
+- [x] Minimum viable product  <-- You are Here
 - [ ] Alpha Release
 - [ ] Feature-Complete Release
