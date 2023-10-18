@@ -61,7 +61,9 @@ source ./env/bin/activate
 pip install "./api[dev]"
 ```
 
-### Running Locally
+## Running the API
+
+### Running locally
 
 After installing the package, from the root directory (containing this README)
 
@@ -71,26 +73,22 @@ uvicorn api.main:app --reload
 
 By default, the API will be served on `localhost:8000`, with OpenAPI documentation available at `localhost:8000/docs`
 
-### Running via Docker Compose
+### Deploying the API
 
-Create a `.env` file in the package root directory, based on the `.env.example`provided and noting the following
+When deploying the API for use in production, it's recommended to use [Gunicorn](https://docs.gunicorn.org/en/stable/index.html) to serve the FastAPI application and act as a process manager. Gunicorn can start one or more uvicorn worker processes, listening on the port indicated on startup. Request and response handling is taken care of by individual workers.
 
-- Provide an `API_UID` in the file matching the integer returned by `id -u`
-- Supply a port to `API_PORT` that you will use to access the API
+Gunicorn will restart failing workers, but care should be taken to deal with cases where the Gunicorn process itself is killed.
+It's important to note that Gunicorn does not provide load balancing capability, but relies on the operating system to perform that role.
 
-From the package root directory, bring the API up with
+The documentation recommends `(2 x $num_cores) + 1` workers, although depending on your deployment environment this may not be suitable.
 
-```bash
-docker compose -p swiftapi up --build
-```
-
-where `-p swiftapi` sets the docker compose project name to `swiftapi`.
-
-Bring the running container down with
+As an example, to start this application under Gunicorn on a `localhost` port with your choice of workers:
 
 ```bash
-docker compose down
+gunicorn src.api.main:app --workers ${n_workers} --worker-class uvicorn.workers.UvicornWorker --bind localhost:${port}
 ```
+
+## For developers
 
 ### Running Tests
 
@@ -147,7 +145,7 @@ The `main` branch is for ready-to-deploy release quality code
 
 ## Project Roadmap
 
-- [x] Initial Research <-- You are Here
-- [ ] Minimum viable product
+- [x] Initial Research
+- [x] Minimum viable product  <-- You are Here
 - [ ] Alpha Release
 - [ ] Feature-Complete Release
