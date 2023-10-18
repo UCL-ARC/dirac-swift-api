@@ -1,7 +1,9 @@
 """Implements SWIFTsimIO data processing functionality on the server side.
 
 This module calls SWIFTsimIO functions and creates numpy arrays from HDF5 files
-read on the server.
+read on the server. It uses code available under the GNU General Public License
+version 3 from the SWIFTsimIO library https://github.com/SWIFTSIM/swiftsimio/.
+
 """
 import json
 
