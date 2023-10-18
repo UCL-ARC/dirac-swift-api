@@ -40,11 +40,11 @@ name = "dirac-swift-api"
 optional-dependencies = {dev = [
     "black",
     "build",
-    "mypy==1.4.1",
+    "mypy",
     "pre-commit",
+    "pytest",
     "pytest-cov",
     "pytest-mock",
-    "pytest==7.4.0",
     "ruff",
     "tox",
     "twine",
