@@ -65,7 +65,15 @@ pip install "./api[dev,test]"
 
 ### Running locally
 
-After installing the package, from the root directory (containing this README)
+After installing the package, from the root directory (containing this README), run in development mode with
+
+```bash
+python src/api/main.py
+```
+
+which will launch a [uvicorn](https://www.uvicorn.org/) server on `127.0.0.1`/`localhost` on the default port `8000`.
+
+Alternatively, in the same directory the app can be equivalently launched with
 
 ```bash
 uvicorn api.main:app --reload
