@@ -125,7 +125,7 @@ def get_authenticated_user(
             status_code=401,
             detail="No token provided with request.",
         )
-    logger.warning(f"Received token: {authorisation.credentials}")
+    logger.info(f"Received token: {authorisation.credentials}")
     return decode_jwt(authorisation.credentials, settings)
 
 

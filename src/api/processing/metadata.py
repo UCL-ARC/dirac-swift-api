@@ -5,7 +5,12 @@ from typing import Any
 
 import cloudpickle
 import numpy as np
-from swiftsimio.reader import MassTable, SWIFTMetadata, SWIFTParticleTypeMetadata
+from swiftsimio.reader import (
+    MassTable,
+    SWIFTMetadata,
+    SWIFTParticleTypeMetadata,
+    SWIFTUnits,
+)
 from unyt import unyt_quantity
 
 from api.processing.units import RemoteSWIFTUnits
@@ -47,12 +52,12 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def create_swift_metadata(filename: str, units: RemoteSWIFTUnits) -> bytes:
+def create_swift_metadata(filename: str, units: SWIFTUnits) -> bytes:
     """Return a SWIFTMetadata object, serialised with pickle.
 
     Args:
         filename (str): File path of specified HDF5 file
-        units (RemoteSWIFTUnits): Units object.
+        units (SWIFTUnits): SWIFT Units object.
 
     Raises
     ------
