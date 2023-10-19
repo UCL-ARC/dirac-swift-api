@@ -9,6 +9,7 @@ from swiftsimio.reader import (
     MassTable,
     SWIFTMetadata,
     SWIFTParticleTypeMetadata,
+    SWIFTUnits,
 )
 from unyt import unyt_quantity
 
@@ -51,12 +52,12 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def create_swift_metadata(filename: str, units: RemoteSWIFTUnits) -> bytes:
+def create_swift_metadata(filename: str, units: RemoteSWIFTUnits | SWIFTUnits) -> bytes:
     """Return a SWIFTMetadata object, serialised with pickle.
 
     Args:
         filename (str): File path of specified HDF5 file
-        units (RemoteSWIFTUnits): Units object.
+        units (Union[RemoteSWIFTUnits, SWIFTUnits]): Units object.
 
     Raises
     ------
