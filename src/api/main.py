@@ -2,6 +2,7 @@
 
 from importlib import metadata
 
+import uvicorn
 from fastapi import FastAPI
 from loguru import logger
 
@@ -41,3 +42,12 @@ async def ping() -> dict[str, str]:
         dict[str, str]: Some example content
     """
     return {"ping": "pong"}
+
+
+if __name__ == "__main__":
+    uvicorn.run(
+        "api.main:app",
+        host="127.0.0.1",
+        port=8000,
+        reload=True,
+    )
