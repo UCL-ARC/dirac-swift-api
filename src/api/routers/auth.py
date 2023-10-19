@@ -6,10 +6,7 @@ from functools import lru_cache
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Security, status
-from fastapi.security import (
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-)
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
 from pydantic import BaseModel
 

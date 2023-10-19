@@ -5,11 +5,7 @@ from typing import Any
 
 import cloudpickle
 import numpy as np
-from swiftsimio.reader import (
-    MassTable,
-    SWIFTMetadata,
-    SWIFTParticleTypeMetadata,
-)
+from swiftsimio.reader import MassTable, SWIFTMetadata, SWIFTParticleTypeMetadata
 from unyt import unyt_quantity
 
 from api.processing.units import RemoteSWIFTUnits
