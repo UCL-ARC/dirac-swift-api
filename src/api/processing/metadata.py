@@ -52,12 +52,12 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def create_swift_metadata(filename: str, units: SWIFTUnits) -> bytes:
+def create_swift_metadata(filename: str, units: RemoteSWIFTUnits | SWIFTUnits) -> bytes:
     """Return a SWIFTMetadata object, serialised with pickle.
 
     Args:
         filename (str): File path of specified HDF5 file
-        units (SWIFTUnits): SWIFT Units object.
+        units (Union[RemoteSWIFTUnits, SWIFTUnits]): Units object.
 
     Raises
     ------

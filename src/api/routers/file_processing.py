@@ -281,6 +281,30 @@ async def get_unmasked_array_data(
     )
 
 
+@router.post("/metadata_remoteunits")
+async def retrieve_metadata_with_remote_units(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> Response:
+    """Retrieve metadata from a file path.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Base dataspec specifying file path or alias.
+
+    Returns
+    -------
+        dict: Metadata for specified file
+    """
+    processor = SWIFTProcessor(dataset_map)
+    file_path = str(get_file_path(data_spec, processor).resolve())
+
+    swift_units = SWIFTUnits(file_path)
+
+    serialised_metadata = create_swift_metadata(file_path, swift_units)
+
+    return Response(content=serialised_metadata, media_type="application/octet-stream")
+
+
 @router.post("/metadata")
 async def retrieve_metadata(
     data_spec: SWIFTBaseDataSpec,
@@ -342,7 +366,7 @@ async def retrieve_units(
     """
     processor = SWIFTProcessor(dataset_map)
 
-    file_path = str(get_file_path(data_spec, processor).resolve())
+    file_path = get_file_path(data_spec, processor).resolve()
 
     serialised_units = create_swift_units(file_path)
 
