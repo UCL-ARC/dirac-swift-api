@@ -395,6 +395,27 @@ def test_retrieve_metadata(
     assert isinstance(retrieved_metadata_object, SWIFTMetadata)
 
 
+def test_retrieve_metadata_remoteunits(
+    template_swift_data_path,
+    mock_auth_client_success_jwt_decode,
+):
+    payload = {
+        "data_spec": {
+            "filename": str(template_swift_data_path),
+        },
+    }
+
+    response = mock_auth_client_success_jwt_decode.post(
+        "/swiftdata/metadata_remoteunits",
+        json=payload,
+    )
+
+    assert response.status_code == status.HTTP_200_OK
+    retrieved_metadata_object = cloudpickle.loads(response.content)
+
+    assert isinstance(retrieved_metadata_object, SWIFTMetadata)
+
+
 def test_retrieve_units(template_swift_data_path, mock_auth_client_success_jwt_decode):
     payload = {
         "data_spec": {
