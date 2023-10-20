@@ -109,8 +109,8 @@ class SWIFTProcessor:
             "dtype": data_type,
         }
 
+    @staticmethod
     def get_array_masked(
-        self,
         filename: str,
         field: str,
         mask_json: str | None,
@@ -167,8 +167,8 @@ class SWIFTProcessor:
                 message = f"Field {field} not found in {filename}."
                 raise SWIFTProcessorError(message) from KeyError
 
+    @staticmethod
     def get_array_unmasked(
-        self,
         filename: str,
         field: str,
         columns: None | np.lib.index_tricks.IndexExpression = None,

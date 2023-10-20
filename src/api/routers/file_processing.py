@@ -222,7 +222,7 @@ async def get_masked_array_data(
         )
 
     try:
-        masked_array = processor.get_array_masked(
+        masked_array = SWIFTProcessor.get_array_masked(
             file_path,
             data_spec.field,
             data_spec.mask_array_json,
@@ -270,7 +270,7 @@ async def get_unmasked_array_data(
 
     file_path = str(get_file_path(data_spec, processor).resolve())
 
-    unmasked_array = processor.get_array_unmasked(
+    unmasked_array = SWIFTProcessor.get_array_unmasked(
         file_path,
         data_spec.field,
         data_spec.columns,

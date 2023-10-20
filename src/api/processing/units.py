@@ -1,5 +1,6 @@
 """Handle server-side unit calculation and conversion to JSON."""
 import json
+from functools import lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -170,6 +171,7 @@ def create_unyt_quantities(swift_unit_dict: dict) -> dict[str, Any]:
     return swift_unit_dict
 
 
+@lru_cache(maxsize=128)
 def create_swift_units(filename: Path) -> bytes:
     """Return a SWIFTUnits object, serialised with pickle.
 

@@ -1,6 +1,7 @@
 """Perform server side metadata processing."""
 import json
 from datetime import datetime
+from functools import lru_cache
 from typing import Any
 
 import cloudpickle
@@ -52,6 +53,7 @@ class SWIFTMetadataEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+@lru_cache(maxsize=128)
 def create_swift_metadata(filename: str, units: RemoteSWIFTUnits | SWIFTUnits) -> bytes:
     """Return a SWIFTMetadata object, serialised with pickle.
 
