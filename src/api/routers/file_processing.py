@@ -87,7 +87,7 @@ class SWIFTDataSpecException(HTTPException):
 
 
 @router.post("/mask_boxsize")
-async def get_mask_boxsize(
+def get_mask_boxsize(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
@@ -107,7 +107,7 @@ async def get_mask_boxsize(
 
 
 @router.post("/filepath")
-async def get_filepath_from_alias(
+def get_filepath_from_alias(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> Path:
@@ -125,7 +125,7 @@ async def get_filepath_from_alias(
 
 
 @router.post("/mask")
-async def get_mask(
+def get_mask(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> bytes:
@@ -186,7 +186,7 @@ def get_file_path(data_spec: SWIFTBaseDataSpec, processor: SWIFTProcessor) -> Pa
 
 
 @router.post("/masked_dataset")
-async def get_masked_array_data(
+def get_masked_array_data(
     data_spec: SWIFTMaskedDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
@@ -242,7 +242,7 @@ async def get_masked_array_data(
 
 
 @router.post("/unmasked_dataset")
-async def get_unmasked_array_data(
+def get_unmasked_array_data(
     data_spec: SWIFTUnmaskedDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
@@ -282,7 +282,7 @@ async def get_unmasked_array_data(
 
 
 @router.post("/metadata_remoteunits")
-async def retrieve_metadata_with_remote_units(
+def retrieve_metadata_with_remote_units(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> Response:
@@ -306,7 +306,7 @@ async def retrieve_metadata_with_remote_units(
 
 
 @router.post("/metadata")
-async def retrieve_metadata(
+def retrieve_metadata(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> Response:
@@ -330,7 +330,7 @@ async def retrieve_metadata(
 
 
 @router.post("/units_dict")
-async def retrieve_units_dict(
+def retrieve_units_dict(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
@@ -351,7 +351,7 @@ async def retrieve_units_dict(
 
 
 @router.post("/units")
-async def retrieve_units(
+def retrieve_units(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
