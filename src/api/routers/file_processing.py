@@ -12,11 +12,7 @@ from api.processing.data_processing import (
 )
 from api.processing.masks import return_mask, return_mask_boxsize
 from api.processing.metadata import create_swift_metadata
-from api.processing.units import (
-    RemoteSWIFTUnits,
-    retrieve_swiftunits_dict,
-    retrieve_units_json_compatible,
-)
+from api.processing.units import create_swift_units, retrieve_units_json_compatible
 from api.routers.auth import get_authenticated_user
 
 router = APIRouter(
@@ -301,9 +297,8 @@ async def retrieve_metadata_with_remote_units(
     """
     processor = SWIFTProcessor(dataset_map)
     file_path = str(get_file_path(data_spec, processor).resolve())
-    units = retrieve_swiftunits_dict(file_path)
 
-    swift_units = RemoteSWIFTUnits(units)
+    swift_units = SWIFTUnits(file_path)
 
     serialised_metadata = create_swift_metadata(file_path, swift_units)
 
@@ -335,7 +330,7 @@ async def retrieve_metadata(
 
 
 @router.post("/units_dict")
-async def retrieve_units(
+async def retrieve_units_dict(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> dict:
@@ -353,3 +348,26 @@ async def retrieve_units(
     file_path = str(get_file_path(data_spec, processor).resolve())
 
     return retrieve_units_json_compatible(file_path)
+
+
+@router.post("/units")
+async def retrieve_units(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> dict:
+    """Retrieve units for the specified file.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Base dataspec specifying file path or alias.
+
+    Returns
+    -------
+        dict: Unit data for specified file
+    """
+    processor = SWIFTProcessor(dataset_map)
+
+    file_path = get_file_path(data_spec, processor).resolve()
+
+    serialised_units = create_swift_units(file_path)
+
+    return Response(content=serialised_units, media_type="application/octet-stream")

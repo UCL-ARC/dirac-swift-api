@@ -1,10 +1,16 @@
 """Handle server-side unit calculation and conversion to JSON."""
 import json
+from pathlib import Path
 from typing import Any
 
+import cloudpickle
 from fastapi import HTTPException, status
 from swiftsimio.reader import SWIFTUnits
 from unyt import unyt_quantity
+
+
+class RemoteSWIFTUnitsError(Exception):
+    """Custom error class for metadata serialisation."""
 
 
 class RemoteSWIFTUnits:
@@ -162,3 +168,25 @@ def create_unyt_quantities(swift_unit_dict: dict) -> dict[str, Any]:
         ) from error
 
     return swift_unit_dict
+
+
+def create_swift_units(filename: Path) -> bytes:
+    """Return a SWIFTUnits object, serialised with pickle.
+
+    Args:
+        filename (Path): File path of specified HDF5 file
+    Raises
+    ------
+        RemoteSWIFTUnitsError: Raised in case of failed JSON serialisation.
+
+    Returns
+    -------
+        bytes: Pickled SWIFTUnits object
+    """
+    units = SWIFTUnits(filename)
+
+    try:
+        return cloudpickle.dumps(units)
+    except Exception as error:  # noqa: BLE001
+        message = f"Error serialising metadata: {error!s}"
+        raise RemoteSWIFTUnitsError(message) from error

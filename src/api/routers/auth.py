@@ -6,10 +6,7 @@ from functools import lru_cache
 
 import jwt
 from fastapi import APIRouter, Depends, HTTPException, Security, status
-from fastapi.security import (
-    HTTPAuthorizationCredentials,
-    HTTPBearer,
-)
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from loguru import logger
 from pydantic import BaseModel
 
@@ -128,7 +125,7 @@ def get_authenticated_user(
             status_code=401,
             detail="No token provided with request.",
         )
-    logger.warning(f"Received token: {authorisation.credentials}")
+    logger.info(f"Received token: {authorisation.credentials}")
     return decode_jwt(authorisation.credentials, settings)
 
 
