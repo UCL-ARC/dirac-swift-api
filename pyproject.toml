@@ -7,7 +7,6 @@ requires = [
 [project]
 authors = [
     {email = "h.moss@ucl.ac.uk", name = "Harry Moss"},
-    {email = "ilektra.christidi@ucl.ac.uk", name = "Ilektra Christidi"},
     {email = "p.andrews-briscoe@ucl.ac.uk", name = "Peter Andrews-Briscoe"},
 ]
 classifiers = [

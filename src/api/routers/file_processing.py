@@ -3,6 +3,7 @@ from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from pydantic import BaseModel
+from swiftsimio.reader import SWIFTUnits
 
 from api.processing.data_processing import (
     SWIFTProcessor,
@@ -284,8 +285,8 @@ async def get_unmasked_array_data(
     )
 
 
-@router.post("/metadata")
-async def retrieve_metadata(
+@router.post("/metadata_remoteunits")
+async def retrieve_metadata_with_remote_units(
     data_spec: SWIFTBaseDataSpec,
     _: str = Depends(get_authenticated_user),
 ) -> Response:
@@ -303,6 +304,30 @@ async def retrieve_metadata(
     units = retrieve_swiftunits_dict(file_path)
 
     swift_units = RemoteSWIFTUnits(units)
+
+    serialised_metadata = create_swift_metadata(file_path, swift_units)
+
+    return Response(content=serialised_metadata, media_type="application/octet-stream")
+
+
+@router.post("/metadata")
+async def retrieve_metadata(
+    data_spec: SWIFTBaseDataSpec,
+    _: str = Depends(get_authenticated_user),
+) -> Response:
+    """Retrieve metadata from a file path.
+
+    Args:
+        data_spec (SWIFTBaseDataSpec): Base dataspec specifying file path or alias.
+
+    Returns
+    -------
+        dict: Metadata for specified file
+    """
+    processor = SWIFTProcessor(dataset_map)
+    file_path = str(get_file_path(data_spec, processor).resolve())
+
+    swift_units = SWIFTUnits(file_path)
 
     serialised_metadata = create_swift_metadata(file_path, swift_units)
 
