@@ -109,18 +109,16 @@ def test_generate_dict_from_ndarray_float32_big_endian():
 
 
 def test_get_array_unmasked_no_columns(
-    template_dataset_alias_map,
     template_swift_data_path,
 ):
     test_field = "PartType0/DiffusionParameters"
     test_columns = None
-    processor = SWIFTProcessor(template_dataset_alias_map)
 
     expected_shape = (32382,)
     expected_first_element_6dp = "6.377697e-06"
     expected_20k_element_6dp = "8.940697e-07"
 
-    output = processor.get_array_unmasked(
+    output = SWIFTProcessor.get_array_unmasked(
         template_swift_data_path,
         test_field,
         test_columns,
@@ -132,12 +130,10 @@ def test_get_array_unmasked_no_columns(
 
 
 def test_get_array_unmasked_columns(
-    template_dataset_alias_map,
     template_swift_data_path,
 ):
     test_field = "PartType0/SmoothedElementMassFractions"
     test_columns = 0
-    processor = SWIFTProcessor(template_dataset_alias_map)
 
     expected_shape = (32382,)
     expected_first_element_col0 = "0.75200003"
@@ -145,7 +141,7 @@ def test_get_array_unmasked_columns(
     expected_first_element_col1 = "0.24800000"
     expected_final_element_col1 = "0.24800000"
 
-    output = processor.get_array_unmasked(
+    output = SWIFTProcessor.get_array_unmasked(
         template_swift_data_path,
         test_field,
         test_columns,
@@ -156,7 +152,7 @@ def test_get_array_unmasked_columns(
     assert f"{output[-1]:.8f}" == expected_final_element_col0
 
     test_columns = 1
-    output = processor.get_array_unmasked(
+    output = SWIFTProcessor.get_array_unmasked(
         template_swift_data_path,
         test_field,
         test_columns,
@@ -167,14 +163,12 @@ def test_get_array_unmasked_columns(
 
 
 def test_get_array_unmasked_field_keyerror_yields_none(
-    template_dataset_alias_map,
     template_swift_data_path,
 ):
     test_field = "PartType0/NotARealField"
     test_columns = None
-    processor = SWIFTProcessor(template_dataset_alias_map)
 
-    output = processor.get_array_unmasked(
+    output = SWIFTProcessor.get_array_unmasked(
         template_swift_data_path,
         test_field,
         test_columns,
@@ -183,7 +177,6 @@ def test_get_array_unmasked_field_keyerror_yields_none(
 
 
 def test_get_array_spatial_masked_no_columns(
-    template_dataset_alias_map,
     template_swift_data_path,
 ):
     test_mask_array_json = "[[0, 334]]"
@@ -193,12 +186,10 @@ def test_get_array_spatial_masked_no_columns(
     test_columns = None
     test_filename = str(template_swift_data_path)
 
-    processor = SWIFTProcessor(template_dataset_alias_map)
-
     expected_first_element = "6.37769699e-06"
     expected_final_element = "8.94069672e-07"
 
-    masked_array = processor.get_array_masked(
+    masked_array = SWIFTProcessor.get_array_masked(
         test_filename,
         test_field,
         test_mask_array_json,
@@ -213,7 +204,6 @@ def test_get_array_spatial_masked_no_columns(
 
 
 def test_get_array_spatial_masked_columns(
-    template_dataset_alias_map,
     template_swift_data_path,
 ):
     test_mask_array_json = "[[0, 334]]"
@@ -223,12 +213,10 @@ def test_get_array_spatial_masked_columns(
     test_columns = 0
     test_filename = str(template_swift_data_path)
 
-    processor = SWIFTProcessor(template_dataset_alias_map)
-
     expected_first_element = "0.75200003"
     expected_final_element = "0.75199974"
 
-    masked_array = processor.get_array_masked(
+    masked_array = SWIFTProcessor.get_array_masked(
         test_filename,
         test_field,
         test_mask_array_json,
