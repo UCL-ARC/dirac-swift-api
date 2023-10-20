@@ -63,6 +63,10 @@ pip install "./api[dev,test]"
 
 ## Running the API
 
+### Getting authenticated
+
+The API can be accessed after JWT authentication. After submitting your username and password, a token will be generated, which will be attached to a header in all your requests. The token will have a lifespan of an hour, after which you'll need to generate a new token by signing in again.
+
 ### Running locally
 
 After installing the package, from the root directory (containing this README), run in development mode with
