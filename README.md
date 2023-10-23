@@ -88,13 +88,82 @@ When deploying the API for use in production, it's recommended to use [Gunicorn]
 Gunicorn will restart failing workers, but care should be taken to deal with cases where the Gunicorn process itself is killed.
 It's important to note that Gunicorn does not provide load balancing capability, but relies on the operating system to perform that role.
 
-The documentation recommends `(2 x $num_cores) + 1` workers, although depending on your deployment environment this may not be suitable.
+Gunicorn documentation recommends `(2 x $num_cores) + 1` workers, although depending on your deployment environment this may not be suitable.
 
 As an example, to start this application under Gunicorn on a `localhost` port with your choice of workers:
 
 ```bash
 gunicorn src.api.main:app --workers ${n_workers} --worker-class uvicorn.workers.UvicornWorker --bind localhost:${port}
 ```
+
+## Using the API
+
+The API is heavily coupled with the [SWIFTsimIO](https://github.com/SWIFTSIM/swiftsimio) library and performs server-side manipulation of objects defined in the library. As well as being a dependency of this software, SWIFTsimIO was thought to be a typical client of the API.
+
+A typical workflow is outlined below from a user's perspective. API endpoints are protected and require a valid JWT token to access. Token access depends on successful authentication with the [VirgoDB database](https://virgodb.dur.ac.uk/), which users will need a valid account for before using the API.
+
+Tokens are retrieved from the `/tokens` endpoint when a valid VirgoDB username/password combination is provided. Tokens can then be added to the header of subsequent requests to successfully access the endpoints.
+
+API endpoints are available for the retrieval of `SWIFTUnits`, `SWIFTMetadata`, masked and unmasked Particle Datasets (as numpy arrays). See the API documentation at the `/docs` endpoint for a full description of available endpoints.
+
+A typical user workflow looks like
+
+- Generate a token by authenticating against the API
+- Add token to subsequent request headers
+- Retrieve items of interest from the API
+
+### Getting authenticated
+
+The API can be accessed after JWT authentication. After submitting your username and password, a token will be generated, which will be attached to a header in all your requests. The token will have a lifespan of an hour, set in `SWIFTAuthenticator.generate_token`, after which you'll need to generate a new token by signing in again.
+
+Tokens should be added to the request headers as (Python 3 example):
+
+```python
+{"Authorization": f"Bearer {token}"}
+```
+
+### Sending requests
+
+Authentication aside, most of the useful routes use HTTP POST requests to retrieve objects of interest. Data should be sent as a dictionary, with the documentation detailing which fields are required in each case. The `settings` dictionary shown in the example docs can be omitted.
+
+For example, the `/swiftdata/masked_dataset` endpoint requires
+
+- dataset alias OR the full path to a file
+- field of interest
+- the mask array serialised to JSON
+- the data type of items in the mask array
+- the mask size
+- named columns to include
+
+Which should be provided as a dictionary:
+
+```python
+payload = {
+  "data_spec": {
+    "alias": "string",
+    "filename": "string",
+    "field": "string",
+    "mask_array_json": "string",
+    "mask_data_type": "string",
+    "mask_size": 0,
+    "columns": 0
+  }
+}
+```
+
+This should be included in requests as the `json` parameter, for example
+
+```bash
+requests.post(url, json=payload)
+```
+
+which sets the `Content-Type` header to `application/json`.
+
+### Sessions
+
+It's recommended to use a single [Session](https://requests.readthedocs.io/en/latest/user/advanced/#session-objects) (or similar) when making multiple API calls.
+
+Sessions allow for the use of a single TCP connection when sending multiple requests and allow headers to persist between requests. In this case, attaching the token to the header does not need to be performed during every request (unless the token has expired).
 
 ## For developers
 
@@ -113,6 +182,10 @@ python -m pytest -ra . --cov=src/api
 ```
 
 either of which will run all tests and generate a coverage report.
+
+### API documentation
+
+Automatic documentation is produced when starting the API on the `/docs` endpoint. These detail all available routes, provide the ability to interactively call them and give example input.
 
 ## Contributing
 
