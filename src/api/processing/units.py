@@ -118,6 +118,8 @@ def retrieve_units_json_compatible(filename: str) -> dict:
         dict: JSON-serialisable units dictionary.
     """
     units = SWIFTUnits(filename)
+    if hasattr(units, "_handle"):
+        units._handle = None  # do not serialize file handle
     return convert_swift_units_dict_types(units.__dict__)
 
 
