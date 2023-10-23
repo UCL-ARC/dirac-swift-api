@@ -179,6 +179,7 @@ def create_swift_units(filename: Path) -> bytes:
 
     Args:
         filename (Path): File path of specified HDF5 file
+
     Raises
     ------
         RemoteSWIFTUnitsError: Raised in case of failed JSON serialisation.
