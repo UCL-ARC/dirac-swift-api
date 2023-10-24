@@ -70,6 +70,8 @@ def create_swift_metadata(filename: str, units: RemoteSWIFTUnits | SWIFTUnits) -
         bytes: Pickled SWIFTMetadata object
     """
     metadata = SWIFTMetadata(filename, units)
+    if hasattr(metadata.units, "_handle"):
+        metadata.units._handle = None  # do not serialize file handle
 
     try:
         return cloudpickle.dumps(metadata)
