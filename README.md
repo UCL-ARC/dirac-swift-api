@@ -58,7 +58,7 @@ source ./env/bin/activate
 - While in the top-level repository directory (containing this `README.md`)
 
 ```bash
-pip install "./api[dev,test]"
+pip install "./[dev,test]"
 ```
 
 ## Running the API
