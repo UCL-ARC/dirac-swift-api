@@ -63,6 +63,12 @@ pip install "./api[dev,test]"
 
 ## Running the API
 
+### Defining required settings
+
+Some settings variables are required by `src/api/config.py`, and can be set via a `.env` file as shown in the `.env.example` file. To set these when running the application, create a `.env` file in the top level directory of this repository based on `.env.example`, but providing your own values where required.
+
+Settings variables can also be set directly from environment variables when running the application if a `.env` file is not found.
+
 ### Running locally
 
 After installing the package, from the root directory (containing this README), run in development mode with
